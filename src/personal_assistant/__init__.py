@@ -13,6 +13,12 @@ from .commands import (
     add_birthday,
     show_birthday,
     birthdays,
+    add_note,
+    find_note_by_title,
+    delete_note,
+    change_note,
+    find_note_by_tag,
+    show_all_notes,
 )
 
 __all__ = [
@@ -33,4 +39,10 @@ __all__ = [
     "add_birthday",
     "show_birthday",
     "birthdays",
+    "add_note",
+    "find_note_by_title",
+    "delete_note",
+    "change_note",
+    "find_note_by_tag",
+    "show_all_notes",
 ]

@@ -18,6 +18,12 @@ from personal_assistant import (
     add_birthday,
     show_birthday,
     birthdays,
+    add_note,
+    find_note_by_title,
+    delete_note,
+    change_note,
+    find_note_by_tag,
+    show_all_notes,
 )
 
 
@@ -29,13 +35,19 @@ class Command_Use(Enum):
     ADD_BIRTHDAY = "add-birthday [name] [birthday]"
     SHOW_BIRTHDAY = "show-birthday [name]"
     BIRTHDAYS = "birthdays"
+    ADD_NOTE = "add-note"
+    FIND_NOTE_BY_TITLE = "find-note-by-title"
+    DELETE_NOTE = "delete-note"
+    CHANGE_NOTE = "change-note"
+    FIND_NOTE_BY_TAG = "find-note-by-tag"
+    ALL_NOTES = "all-notes"
     HELLO = "hello"
     CLOSE = "close"
     EXIT = "exit"
 
 
 def main():
-    book = load_data()
+    book, notes = load_data()
 
     print("Welcome to the assistant bot!")
 
@@ -49,7 +61,7 @@ def main():
         match command:
             case "close" | "exit":
                 print("Good bye!")
-                save_data(book)
+                save_data(book, notes)
                 break
 
             case "hello":
@@ -75,6 +87,24 @@ def main():
 
             case "birthdays":
                 print(birthdays(book))
+
+            case "add-note":
+                print(add_note(notes))
+
+            case "find-note-by-title":
+                print(find_note_by_title(notes))
+
+            case "delete-note":
+                print(delete_note(notes))
+
+            case "change-note":
+                print(change_note(notes))
+
+            case "find-note-by-tag":
+                print(find_note_by_tag(notes))
+
+            case "all-notes":
+                print(show_all_notes(notes))
 
             case _:
                 print("Invalid command. The following commands are available:")
