@@ -45,3 +45,23 @@ class Birthday(Field):
 
     def __str__(self):
         return self.value.strftime("%d.%m.%Y")
+
+
+class Title(Field):
+    def __init__(self, value):
+        super().__init__(value)
+        if not value:
+            raise ValidationError("Title cannot be empty")
+        
+
+class Content(Field):
+    def __init__(self, value):
+        super().__init__(value)
+
+
+class Tags(Field):
+    def __init__(self, value):
+        super().__init__(value)
+        if not value:
+            raise ValidationError("Tags cannot be empty")
+        

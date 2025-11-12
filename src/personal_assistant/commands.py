@@ -1,6 +1,7 @@
 from .utils import input_error
 from .addressbook import AddressBook
 from .record import Record
+from .notes import Notes
 
 
 @input_error
@@ -91,3 +92,47 @@ def birthdays(book: AddressBook):
     return ", ".join(
         f"{user['name']}: {user['congratulation_date']}" for user in upcoming_bds
     )
+
+@input_error
+def add_note(notes: Notes) -> str:
+    title = input("Enter note title: ")
+    text = input("Enter note text: ")
+    tags = input("Enter note tags (comma separated): ")
+    notes.add_note(title, text, tags)
+    return f"Note with title '{title}' added successfully."
+
+@input_error
+def find_note_by_title(notes: Notes) -> str:
+    title = input("Enter note title to find: ")
+    note = notes.find_note_by_title(title)
+    if note:
+        return str(note)
+    else:
+        return f"Note with title '{title}' not found."
+    
+@input_error
+def delete_note(notes: Notes) -> str:
+    title = input("Enter note title to delete: ")
+    message = notes.delete_note(title)
+    return message
+
+@input_error
+def change_note(notes: Notes) -> str:
+    title = input("Enter note title to edit: ")
+    new_content = input("Enter new content: ")
+    new_tags = input("Enter new tags (comma separated): ")
+    message = notes.change_note(title, new_content if new_content else None, new_tags if new_tags else None)
+    return message
+
+@input_error
+def find_note_by_tag(notes: Notes) -> str:
+    tag = input("Enter tag to find note: ")
+    matched_notes = notes.find_note_by_tag(tag)
+    if matched_notes:
+        return "\n".join(str(note) for note in matched_notes)
+    else:
+        return f"No notes found with tag '{tag}'."
+    
+@input_error
+def show_all_notes(notes: Notes) -> str:
+    return notes.show_all_notes()
