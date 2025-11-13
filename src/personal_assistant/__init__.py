@@ -19,6 +19,7 @@ from .commands import (
     change_note,
     find_note_by_tag,
     show_all_notes,
+    add_address,  # додали
 )
 
 __all__ = [

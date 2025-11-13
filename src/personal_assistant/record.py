@@ -1,4 +1,4 @@
-from .fields import Name, Phone, Birthday
+from .fields import Name, Phone, Birthday, Address
 from .errors import ValidationError
 
 
@@ -7,6 +7,7 @@ class Record:
         self.name = Name(name)
         self.phones = []
         self.birthday = None  # поле не обов'язкове, але може бути тільки одне
+        self.address = None   # нове поле для адреси
 
     def add_phone(self, number):
         for phone_obj in self.phones:
@@ -71,6 +72,16 @@ class Record:
                 except ValidationError as e:
                     return f"ERROR! {e}"
 
+    def add_address(self, address: str):
+        """Додає або змінює адресу контакта з валідацією."""
+        try:
+            self.address = Address(address)
+            return f"Address '{address}' is added to {self.name.value}'s record"
+        except ValidationError as e:
+            return f"ERROR! {e}"
+
     def __str__(self):
+        phones_str = '; '.join(p.value for p in self.phones) if self.phones else "no phones"
         bday_str = f", birthday: {self.birthday}" if self.birthday else ""
-        return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}{bday_str}"
+        address_str = f", address: {self.address.value}" if self.address else ""
+        return f"Contact name: {self.name.value}, phones: {phones_str}{bday_str}{address_str}"
