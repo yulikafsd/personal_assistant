@@ -37,8 +37,10 @@ class Phone(Field):
 class Birthday(Field):
     def __init__(self, birthday):
 
-        if isinstance(birthday, str) and re.match(r"\d{2}\.\d{2}\.\d{4}$", birthday):
-            super().__init__(datetime.strptime(birthday, "%d.%m.%Y"))
+        if isinstance(birthday, str) and re.match(
+            r"\d{2}\.\d{2}\.\d{4}$", birthday.strip()
+        ):
+            super().__init__(datetime.strptime(birthday.strip(), "%d.%m.%Y"))
 
         else:
             raise ValidationError(f"Invalid date format of {birthday}. Use DD.MM.YYYY")
@@ -50,24 +52,24 @@ class Birthday(Field):
 class Title(Field):
     def __init__(self, value):
         super().__init__(value)
-        if not value:
+        if not value or not value.strip():
             raise ValidationError("Title cannot be empty")
-        
+
 
 class Content(Field):
     def __init__(self, value):
-        super().__init__(value)
+        super().__init__(value.strip())
 
 
 class Tags(Field):
     def __init__(self, value):
-        super().__init__(value)
-        if not value:
+        if not value or not value.strip():
             raise ValidationError("Tags cannot be empty")
-        
+        super().__init__(value.strip())
+
 
 class Address(Field):
     def __init__(self, value):
-        if not value.strip():
+        if not value or not value.strip():
             raise ValidationError("Address cannot be empty")
         super().__init__(value.strip())
