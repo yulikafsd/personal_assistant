@@ -15,6 +15,10 @@ from personal_assistant import (
     change_contact,
     show_phone,
     show_all,
+    add_address,
+    add_email,
+    change_email,
+    show_email,
     add_birthday,
     show_birthday,
     birthdays,
@@ -24,7 +28,6 @@ from personal_assistant import (
     change_note,
     find_note_by_tag,
     show_all_notes,
-    add_address,
 )
 
 
@@ -34,15 +37,26 @@ class Command_Use(Enum):
     PHONE = "phone [name]"
     ALL = "all"
     ADD_ADDRESS = "add-address [name] [address]"
+
+    # ---------------- Emails ----------------
+    ADD_EMAIL = "add-email [name] [email]"
+    CHANGE_EMAIL = "change-email [name] [old_email] [new_email]"
+    SHOW_EMAIL = "show-email [name]"
+
+    # ---------------- Birthdays ----------------
     ADD_BIRTHDAY = "add-birthday [name] [birthday]"
     SHOW_BIRTHDAY = "show-birthday [name]"
-    BIRTHDAYS = "birthdays( [days_from_today])"
+    BIRTHDAYS = "birthdays"
+
+    # ---------------- Notes ----------------
     ADD_NOTE = "add-note"
     FIND_NOTE_BY_TITLE = "find-note-by-title"
     DELETE_NOTE = "delete-note"
     CHANGE_NOTE = "change-note"
     FIND_NOTE_BY_TAG = "find-note-by-tag"
     ALL_NOTES = "all-notes"
+
+    # ---------------- General ----------------
     HELLO = "hello"
     CLOSE = "close"
     EXIT = "exit"
@@ -83,6 +97,15 @@ def main():
 
             case "add-address":
                 print(add_address(args, book))
+
+            case "add-email":
+                print(add_email(args, book))
+
+            case "change-email":
+                print(change_email(args, book))
+
+            case "show-email":
+                print(show_email(args, book))
 
             case "add-birthday":
                 print(add_birthday(args, book))

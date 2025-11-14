@@ -47,7 +47,7 @@ def show_phone(args, book: AddressBook):
     if not record:
         return f"Contact with name {name_capitalized} was not found"
     return (
-        f"{name_capitalized}'s phones: {', '.join([p.value for p in record.phones])}"
+        f"{name_capitalized}'s phone(s): {', '.join([p.value for p in record.phones])}"
         if record.phones
         else f"{name_capitalized} has no phone numbers yet."
     )
@@ -58,6 +58,79 @@ def show_all(book: AddressBook):
     if not book.data:
         return "No contacts were found."
     return "\n".join(str(record) for record in book.data.values())
+
+
+@input_error
+def add_address(args, book: AddressBook):
+    if len(args) < 2:
+        return "You must provide name and address."
+
+    name, *address_parts = args
+    name_capitalized = name.capitalize()
+    record = book.find(name_capitalized)
+
+    if not record:
+        return f"Contact with name {name_capitalized} was not found."
+
+    address = " ".join(address_parts)
+    return record.add_address(address)
+
+
+@input_error
+def add_email(args, book: AddressBook):
+    name, email, *_ = args
+    name_capitalized = name.capitalize()
+    record = book.find(name_capitalized)
+
+    if not record:
+        user_input = input(
+            f"Contact with name {name_capitalized} was not found.\nAdd a new contact? Y/N: "
+        )
+        if user_input.lower() == "y":
+            record = Record(name_capitalized)
+            book.add_record(record)
+        else:
+            return "Nothing changed"
+
+    return record.add_email(email)
+
+
+@input_error
+def change_email(args, book: AddressBook):
+    name, old_email, new_email, *_ = args
+    name_capitalized = name.capitalize()
+    record = book.find(name_capitalized)
+
+    if not record:
+        user_input = input(
+            f"Contact with name {name_capitalized} was not found.\nAdd a new contact? Y/N: "
+        )
+        if user_input.lower() == "y":
+            record = Record(name_capitalized)
+            record.add_email(new_email)
+            book.add_record(record)
+            return f"Contact {name_capitalized} created with email {new_email}"
+        else:
+            return "Nothing changed"
+
+    return record.edit_email(old_email, new_email)
+
+
+@input_error
+def show_email(args, book: AddressBook):
+    name = args[0]
+    name_capitalized = name.capitalize()
+    record = book.find(name_capitalized)
+
+    if not record:
+        return f"Contact with name {name_capitalized} was not found."
+
+    if not record.emails:
+        return f"{name_capitalized} has no email yet."
+
+    return (
+        f"{name_capitalized}'s email(s): {', '.join([e.value for e in record.emails])}"
+    )
 
 
 @input_error
@@ -146,18 +219,3 @@ def find_note_by_tag(notes: Notes) -> str:
 @input_error
 def show_all_notes(notes: Notes) -> str:
     return notes.show_all_notes()
-
-@input_error
-def add_address(args, book: AddressBook):
-    if len(args) < 2:
-        return "You must provide name and address."
-
-    name, *address_parts = args
-    name_capitalized = name.capitalize()
-    record = book.find(name_capitalized)
-
-    if not record:
-        return f"Contact with name {name_capitalized} was not found."
-
-    address = " ".join(address_parts)
-    return record.add_address(address)

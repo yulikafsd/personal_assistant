@@ -1,4 +1,4 @@
 class ValidationError(Exception):
     def __init__(self, message):
-        self.message = f'\n{"-"*5} {message} {"-"*5}'
+        self.message = f'\n{"-"*10} {message} {"-"*10}'
         super().__init__(self.message)

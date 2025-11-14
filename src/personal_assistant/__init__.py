@@ -1,6 +1,7 @@
 from .addressbook import AddressBook
 from .record import Record
-from .fields import Name, Phone, Birthday
+from .notes import Note, Notes
+from .fields import Name, Phone, Birthday, Address, Email, Title, Content, Tags
 from .errors import ValidationError
 from .utils import input_error
 from .pickle_data import load_data, save_data
@@ -10,6 +11,10 @@ from .commands import (
     change_contact,
     show_phone,
     show_all,
+    add_address,
+    add_email,
+    change_email,
+    show_email,
     add_birthday,
     show_birthday,
     birthdays,
@@ -19,7 +24,6 @@ from .commands import (
     change_note,
     find_note_by_tag,
     show_all_notes,
-    add_address,  # додали
 )
 
 __all__ = [
@@ -28,6 +32,13 @@ __all__ = [
     "Name",
     "Phone",
     "Birthday",
+    "Address",
+    "Email",
+    "Title",
+    "Content",
+    "Tags",
+    "Note",
+    "Notes",
     "ValidationError",
     "input_error",
     "load_data",
@@ -37,6 +48,8 @@ __all__ = [
     "change_contact",
     "show_phone",
     "show_all",
+    "add_address",
+    "add_email",
     "add_birthday",
     "show_birthday",
     "birthdays",
