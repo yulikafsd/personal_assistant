@@ -5,7 +5,7 @@ sys.path.append("src")
 # перед здачею проєкту видалити 1-3 строки та встановлюти пакет локально командою:
 # pip install -e src/
 
-from personal_assistant import AddressBook, Record
+
 from enum import Enum
 from personal_assistant import (
     load_data,
@@ -114,7 +114,7 @@ def main():
                 print(show_birthday(args, book))
 
             case "birthdays":
-                print(birthdays(book))
+                print(birthdays(args, book))
 
             case "add-note":
                 print(add_note(notes))
