@@ -65,3 +65,9 @@ class Tags(Field):
         if not value:
             raise ValidationError("Tags cannot be empty")
         
+
+class Address(Field):
+    def __init__(self, value):
+        if not value.strip():
+            raise ValidationError("Address cannot be empty")
+        super().__init__(value.strip())

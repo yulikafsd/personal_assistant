@@ -136,3 +136,18 @@ def find_note_by_tag(notes: Notes) -> str:
 @input_error
 def show_all_notes(notes: Notes) -> str:
     return notes.show_all_notes()
+
+@input_error
+def add_address(args, book: AddressBook):
+    if len(args) < 2:
+        return "You must provide name and address."
+
+    name, *address_parts = args
+    name_capitalized = name.capitalize()
+    record = book.find(name_capitalized)
+
+    if not record:
+        return f"Contact with name {name_capitalized} was not found."
+
+    address = " ".join(address_parts)
+    return record.add_address(address)
