@@ -34,7 +34,7 @@ class Command_Use(Enum):
     ALL = "all"
     ADD_BIRTHDAY = "add-birthday [name] [birthday]"
     SHOW_BIRTHDAY = "show-birthday [name]"
-    BIRTHDAYS = "birthdays"
+    BIRTHDAYS = "birthdays( [days_from_today])"
     ADD_NOTE = "add-note"
     FIND_NOTE_BY_TITLE = "find-note-by-title"
     DELETE_NOTE = "delete-note"
@@ -86,7 +86,7 @@ def main():
                 print(show_birthday(args, book))
 
             case "birthdays":
-                print(birthdays(book))
+                print(birthdays(args, book))
 
             case "add-note":
                 print(add_note(notes))

@@ -66,7 +66,7 @@ def add_birthday(args, book: AddressBook):
     name_capitalized = name.capitalize()
     record = book.find(name_capitalized)
     if not record:
-        return "Contact with name {name_capitalized} was not found."
+        return f"Contact with name {name_capitalized} was not found."
     return record.add_birthday(new_birthday)
 
 
@@ -76,22 +76,25 @@ def show_birthday(args, book: AddressBook):
     name_capitalized = name.capitalize()
     record = book.find(name_capitalized)
     if not record:
-        return "Contact with name {name_capitalized} was not found."
+        return f"Contact with name {name_capitalized} was not found."
     if not record.birthday:
         return f"Contact {name_capitalized} has no birthday yet"
     return f"{name_capitalized}'s birthday: {record.birthday}"
 
 
 @input_error
-def birthdays(book: AddressBook):
+def birthdays(args, book: AddressBook):
     if not book.data:
         return "No contacts were found."
-    upcoming_bds = book.get_upcoming_birthdays()
+
+    days_from_today = 7 if not args else int(args[0])
+    upcoming_bds = book.get_upcoming_birthdays(days_from_today)
     if not upcoming_bds:
-        return "No birthdays in the next 7 days."
+        return f"No birthdays in the next {days_from_today} days."
     return ", ".join(
         f"{user['name']}: {user['congratulation_date']}" for user in upcoming_bds
     )
+
 
 @input_error
 def add_note(notes: Notes) -> str:
@@ -101,6 +104,7 @@ def add_note(notes: Notes) -> str:
     notes.add_note(title, text, tags)
     return f"Note with title '{title}' added successfully."
 
+
 @input_error
 def find_note_by_title(notes: Notes) -> str:
     title = input("Enter note title to find: ")
@@ -109,20 +113,25 @@ def find_note_by_title(notes: Notes) -> str:
         return str(note)
     else:
         return f"Note with title '{title}' not found."
-    
+
+
 @input_error
 def delete_note(notes: Notes) -> str:
     title = input("Enter note title to delete: ")
     message = notes.delete_note(title)
     return message
 
+
 @input_error
 def change_note(notes: Notes) -> str:
     title = input("Enter note title to edit: ")
     new_content = input("Enter new content: ")
     new_tags = input("Enter new tags (comma separated): ")
-    message = notes.change_note(title, new_content if new_content else None, new_tags if new_tags else None)
+    message = notes.change_note(
+        title, new_content if new_content else None, new_tags if new_tags else None
+    )
     return message
+
 
 @input_error
 def find_note_by_tag(notes: Notes) -> str:
@@ -132,7 +141,8 @@ def find_note_by_tag(notes: Notes) -> str:
         return "\n".join(str(note) for note in matched_notes)
     else:
         return f"No notes found with tag '{tag}'."
-    
+
+
 @input_error
 def show_all_notes(notes: Notes) -> str:
     return notes.show_all_notes()
