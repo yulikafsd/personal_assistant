@@ -84,4 +84,4 @@ class Record:
         phones_str = '; '.join(p.value for p in self.phones) if self.phones else "no phones"
         bday_str = f", birthday: {self.birthday}" if self.birthday else ""
         address_str = f", address: {self.address.value}" if self.address else ""
-        return f"Contact name: {self.name.value}, phones: {phones_str}{bday_str}{address_str}"
+        return f"Contact name: {self.name.value}, phones: {phones_str}, birthday: {bday_str}, address: {address_str}"
