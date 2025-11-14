@@ -12,6 +12,8 @@ def input_error(func):
                     return "Wrong format. Usage: add-birthday [contact_name] [birthday]"
                 case "show_birthday":
                     return "Wrong format. Usage: show-birthday [contact_name]"
+                case "birthdays":
+                    return "Wrong format. Usage: birthdays [dates_from_today] - must be an integer"
                 case _:
                     return "ValueError"
         except KeyError:

@@ -5,7 +5,7 @@ sys.path.append("src")
 # перед здачею проєкту видалити 1-3 строки та встановлюти пакет локально командою:
 # pip install -e src/
 
-from personal_assistant import AddressBook, Record
+
 from enum import Enum
 from personal_assistant import (
     load_data,
@@ -24,7 +24,7 @@ from personal_assistant import (
     change_note,
     find_note_by_tag,
     show_all_notes,
-    add_address,  #Добавили
+    add_address,
 )
 
 
@@ -33,10 +33,10 @@ class Command_Use(Enum):
     CHANGE = "change [name] [old_phone] [new_phone]"
     PHONE = "phone [name]"
     ALL = "all"
-    ADD_ADDRESS = "add-address [name] [address]"  # новая команда
+    ADD_ADDRESS = "add-address [name] [address]"
     ADD_BIRTHDAY = "add-birthday [name] [birthday]"
     SHOW_BIRTHDAY = "show-birthday [name]"
-    BIRTHDAYS = "birthdays"
+    BIRTHDAYS = "birthdays( [days_from_today])"
     ADD_NOTE = "add-note"
     FIND_NOTE_BY_TITLE = "find-note-by-title"
     DELETE_NOTE = "delete-note"
@@ -82,8 +82,7 @@ def main():
                 print(show_all(book))
 
             case "add-address":
-                print(add_address(args, book))  # новий case
-
+                print(add_address(args, book))
 
             case "add-birthday":
                 print(add_birthday(args, book))
@@ -92,7 +91,7 @@ def main():
                 print(show_birthday(args, book))
 
             case "birthdays":
-                print(birthdays(book))
+                print(birthdays(args, book))
 
             case "add-note":
                 print(add_note(notes))
