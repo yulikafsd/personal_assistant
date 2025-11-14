@@ -1,6 +1,7 @@
-from .errors import ValidationError
 from datetime import datetime
 import re
+
+from .errors import ValidationError
 
 
 class Field:
@@ -34,6 +35,11 @@ class Phone(Field):
 
 class Birthday(Field):
     def __init__(self, birthday):
+        """
+        Приймає:
+        - рядок у форматі DD.MM.YYYY
+        - або datetime (на всякий випадок)
+        """
         # рядок виду "10.04.1995"
         if isinstance(birthday, str) and re.match(r"\d{2}\.\d{2}\.\d{4}$", birthday):
             dt = datetime.strptime(birthday, "%d.%m.%Y")
@@ -61,19 +67,30 @@ class Email(Field):
 
 
 class Title(Field):
-    def __init__(self, value):
-        super().__init__(value)
+    def __init__(self, value: str):
         if not value:
             raise ValidationError("Title cannot be empty")
+        super().__init__(value)
 
 
 class Content(Field):
-    def __init__(self, value):
+    def __init__(self, value: str):
         super().__init__(value)
 
 
 class Tags(Field):
-    def __init__(self, value):
-        super().__init__(value)
+    def __init__(self, value: str):
+        value = value.strip()
         if not value:
             raise ValidationError("Tags cannot be empty")
+        super().__init__(value)
+
+
+class Address(Field):
+    def __init__(self, value: str):
+        clean = value.strip()
+        if not clean:
+            raise ValidationError("Address cannot be empty")
+        super().__init__(clean)
+
+

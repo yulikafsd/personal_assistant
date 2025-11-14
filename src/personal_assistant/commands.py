@@ -4,6 +4,9 @@ from .record import Record
 from .notes import Notes
 
 
+# ============================
+# 📇 Контакти
+# ============================
 @input_error
 def add_contact(args, book: AddressBook):
     name, phone, *_ = args
@@ -15,8 +18,7 @@ def add_contact(args, book: AddressBook):
         book.add_record(record)
     else:
         user_input = input(
-            f"Contact {name_capitalized} already exists.\n"
-            "Add another phone number to the contact? Y/N: "
+            f"Contact {name_capitalized} already exists.\nAdd another phone number to the contact? Y/N: "
         )
         if user_input.lower() == "n":
             return "Nothing changed"
@@ -29,15 +31,16 @@ def change_contact(args, book: AddressBook):
     name, old_phone, new_phone, *_ = args
     name_capitalized = name.capitalize()
     record = book.find(name_capitalized)
+
     if not record:
         user_input = input(
-            f"Contact with name {name_capitalized} was not found.\n"
-            "Add a new contact? Y/N: "
+            f"Contact with name {name_capitalized} was not found.\nAdd a new contact? Y/N: "
         )
         if user_input.lower() == "y":
             return add_contact([name_capitalized, new_phone], book)
         else:
             return "Nothing changed"
+
     return record.edit_phone(old_phone, new_phone)
 
 
@@ -46,13 +49,15 @@ def show_phone(args, book: AddressBook):
     name = args[0]
     name_capitalized = name.capitalize()
     record = book.find(name_capitalized)
+
     if not record:
         return f"Contact with name {name_capitalized} was not found"
-    return (
-        f"{name_capitalized}'s phones: {', '.join([p.value for p in record.phones])}"
-        if record.phones
-        else f"{name_capitalized} has no phone numbers yet."
-    )
+
+    if record.phones:
+        phones = ", ".join([p.value for p in record.phones])
+        return f"{name_capitalized}'s phones: {phones}"
+    else:
+        return f"{name_capitalized} has no phone numbers yet."
 
 
 @input_error
@@ -67,8 +72,10 @@ def add_birthday(args, book: AddressBook):
     name, new_birthday, *_ = args
     name_capitalized = name.capitalize()
     record = book.find(name_capitalized)
+
     if not record:
         return f"Contact with name {name_capitalized} was not found."
+
     return record.add_birthday(new_birthday)
 
 
@@ -77,10 +84,13 @@ def show_birthday(args, book: AddressBook):
     name = args[0]
     name_capitalized = name.capitalize()
     record = book.find(name_capitalized)
+
     if not record:
         return f"Contact with name {name_capitalized} was not found."
+
     if not record.birthday:
         return f"Contact {name_capitalized} has no birthday yet"
+
     return f"{name_capitalized}'s birthday: {record.birthday}"
 
 
@@ -88,52 +98,50 @@ def show_birthday(args, book: AddressBook):
 def birthdays(book: AddressBook):
     if not book.data:
         return "No contacts were found."
+
     upcoming_bds = book.get_upcoming_birthdays()
     if not upcoming_bds:
         return "No birthdays in the next 7 days."
+
     return ", ".join(
         f"{user['name']}: {user['congratulation_date']}" for user in upcoming_bds
     )
 
 
 # ============================
-# 🔍 Пошук контактів
+# 🔍 Пошук контактів (phone/email/birthday)
 # ============================
 @input_error
-def search_contacts(args, book: AddressBook):
+def search_contacts(args, book: AddressBook) -> str:
     """
-    Пошук контактів за номером телефону, email або датою народження.
-
-    Приклади:
-        search phone 1234567890
-        search email user@example.com
-        search birthday 10.04.1995
+    search <field> <value>
+    field: phone / email / birthday
+    birthday: у форматі DD.MM.YYYY
     """
     if len(args) < 2:
-        return (
-            "Вкажіть поле та значення для пошуку.\n"
-            "Приклад: search phone 1234567890"
-        )
+        return "Вкажіть поле та значення для пошуку. Наприклад: search phone 1234567890"
 
-    field, value, *rest = args
-    field = field.lower()
+    field, value, *_ = args
+    field = field.lower().strip()
     value = value.strip()
 
     found_records = []
 
     for record in book.data.values():
         # Пошук за телефоном
-        if field == "phone":
-            if any(p.value == value for p in record.phones):
+        if field in ("phone", "tel"):
+            for phone in record.phones:
+                if phone.value == value:
+                    found_records.append(str(record))
+                    break
+
+        # Пошук за email (якщо поле email додадуть в Record)
+        elif field in ("email", "mail"):
+            email_obj = getattr(record, "email", None)
+            if email_obj and getattr(email_obj, "value", None) == value:
                 found_records.append(str(record))
 
-        # Пошук за email (якщо в запису вже реалізоване поле email)
-        elif field == "email":
-            email = getattr(record, "email", None)
-            if email and getattr(email, "value", None) == value:
-                found_records.append(str(record))
-
-# Пошук за днем народження (формат DD.MM.YYYY)
+        # Пошук за днем народження (формат DD.MM.YYYY)
         elif field in ("birthday", "bday", "bd"):
             if record.birthday:
                 # birthday.value має бути datetime, але робимо обережно
@@ -211,6 +219,30 @@ def show_all_notes(notes: Notes) -> str:
 
 
 # ============================
+# 🏠 Address
+# ============================
+@input_error
+def add_address(args, book: AddressBook) -> str:
+    """
+    Додати/оновити адресу контакта.
+
+    Виклик: add-address <name> <address...>
+    """
+    if len(args) < 2:
+        return "You must provide name and address."
+
+    name, *address_parts = args
+    name_capitalized = name.capitalize()
+    record = book.find(name_capitalized)
+
+    if not record:
+        return f"Contact with name {name_capitalized} was not found."
+
+    address = " ".join(address_parts)
+    return record.add_address(address)
+
+
+# ============================
 # ❓ HELP
 # ============================
 @input_error
@@ -234,6 +266,9 @@ def show_help(*args, **kwargs) -> str:
         "  find-note-title                   – знайти нотатку за заголовком\n"
         "  find-note-tag                     – знайти нотатку за тегом\n"
         "  show-notes                        – показати всі нотатки\n"
+        "  add-address <name> <address>      – додати/оновити адресу контакта\n"
         "  help                              – показати цю довідку\n"
         "  exit | close | good bye           – вийти з помічника\n"
     )
+
+        

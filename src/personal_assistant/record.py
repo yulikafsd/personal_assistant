@@ -1,4 +1,4 @@
-from .fields import Name, Phone, Birthday
+from .fields import Name, Phone, Birthday, Address
 from .errors import ValidationError
 
 
@@ -6,7 +6,8 @@ class Record:
     def __init__(self, name):
         self.name = Name(name)
         self.phones = []
-        self.birthday = None  # опціональне поле
+        self.birthday = None
+        self.address = None
 
     def add_phone(self, number: str):
         for phone_obj in self.phones:
@@ -33,7 +34,7 @@ class Record:
                     phone_obj.update(new_phone)
                     return f"{self.name.value}'s record was updated with a new number: {new_phone}"
                 except ValidationError as e:
-                    return f"ERROR! No phone number was added! {e}"
+                    return f"ERROR! {e}"
         return self.wrong_phone_alert(old_phone)
 
     def find_phone(self, searched_phone):
@@ -66,39 +67,47 @@ class Record:
             except ValueError as e:
                 return f"ERROR! Please, choose a real date, {e}"
 
-        else:
-            print(f"Contact {self.name.value} already has a birthday record")
-            user_input = input(
-                f"Would you like to change {self.name.value}'s birth date? Y/N: "
-            )
-            if user_input.lower() == "n":
-                return "Nothing changed"
-            else:
-                try:
-                    self.birthday = Birthday(birthday)
-                    return f"Birth date of {self.name} was changed to {birthday}"
-                except ValidationError as e:
-                    return f"ERROR! {e}"
+        user_input = input(
+            f"Contact {self.name.value} already has a birthday record.\n"
+            f"Would you like to change it? Y/N: "
+        )
+        if user_input.lower() == "n":
+            return "Nothing changed"
 
-    # =====================================
-    # 🔍 НОВІ МЕТОДИ ДЛЯ ПОШУКУ (ТВОЄ ЗАВДАННЯ)
-    # =====================================
+        try:
+            self.birthday = Birthday(birthday)
+            return f"Birth date of {self.name.value} was changed to {birthday}"
+        except ValidationError as e:
+            return f"ERROR! {e}"
 
+    # ============================
+    # Методи для пошуку
+    # ============================
     def matches_phone(self, phone: str) -> bool:
-        """True якщо хоч один телефон збігається."""
         return any(p.value == phone for p in self.phones)
 
     def matches_birthday(self, date_str: str) -> bool:
-        """True якщо дата збігається з датою народження."""
         if not self.birthday:
             return False
         return str(self.birthday) == date_str
 
+    # ============================
+    # Address
+    # ============================
+    def add_address(self, address: str):
+        try:
+            self.address = Address(address)
+            return f"Address '{address}' is added to {self.name.value}'s record"
+        except ValidationError as e:
+            return f"ERROR! {e}"
+
     def __str__(self):
+        phones_str = "; ".join(p.value for p in self.phones) if self.phones else "no phones"
         bday_str = f", birthday: {self.birthday}" if self.birthday else ""
+        address_str = f", address: {self.address.value}" if self.address else ""
         return (
             f"Contact name: {self.name.value}, "
-            f"phones: {'; '.join(p.value for p in self.phones)}"
+            f"phones: {phones_str}"
             f"{bday_str}"
+            f"{address_str}"
         )
-
