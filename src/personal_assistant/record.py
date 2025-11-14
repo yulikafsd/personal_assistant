@@ -6,20 +6,25 @@ class Record:
     def __init__(self, name):
         self.name = Name(name)
         self.phones = []
-        self.birthday = None  # поле не обов'язкове, але може бути тільки одне
+        self.birthday = None  # опціональне поле
 
-    def add_phone(self, number):
+    def add_phone(self, number: str):
         for phone_obj in self.phones:
             if phone_obj.value == number:
                 return f"{self.name.value}'s record already has the number: {number}"
+
         try:
             self.phones.append(Phone(number))
             return f"{self.name.value}'s record was updated with a new number: {number}"
         except ValidationError as e:
-            return f"ERROR! No phone number was addded! {e}"
+            return f"ERROR! No phone number was added! {e}"
 
     def wrong_phone_alert(self, phone):
-        return f"User {self.name} has no phone {phone}.\nPlease, choose one of the existing phone numbers:\n{chr(10).join(p.value for p in self.phones)}"
+        return (
+            f"User {self.name} has no phone {phone}.\n"
+            f"Please, choose one of the existing phone numbers:\n"
+            f"{chr(10).join(p.value for p in self.phones)}"
+        )
 
     def edit_phone(self, old_phone, new_phone):
         for phone_obj in self.phones:
@@ -28,7 +33,7 @@ class Record:
                     phone_obj.update(new_phone)
                     return f"{self.name.value}'s record was updated with a new number: {new_phone}"
                 except ValidationError as e:
-                    return f"ERROR! No phone number was addded! {e}"
+                    return f"ERROR! No phone number was added! {e}"
         return self.wrong_phone_alert(old_phone)
 
     def find_phone(self, searched_phone):
@@ -44,7 +49,11 @@ class Record:
         for phone_obj in self.phones:
             if phone_obj.value == number:
                 self.phones.remove(phone_obj)
-                return f"User {self.name}'s phone {number} was removed.\nThe remaining phone numbers are:\n{chr(10).join(p.value for p in self.phones)}"
+                return (
+                    f"User {self.name}'s phone {number} was removed.\n"
+                    f"The remaining phone numbers are:\n"
+                    f"{chr(10).join(p.value for p in self.phones)}"
+                )
         return self.wrong_phone_alert(number)
 
     def add_birthday(self, birthday):
@@ -71,6 +80,25 @@ class Record:
                 except ValidationError as e:
                     return f"ERROR! {e}"
 
+    # =====================================
+    # 🔍 НОВІ МЕТОДИ ДЛЯ ПОШУКУ (ТВОЄ ЗАВДАННЯ)
+    # =====================================
+
+    def matches_phone(self, phone: str) -> bool:
+        """True якщо хоч один телефон збігається."""
+        return any(p.value == phone for p in self.phones)
+
+    def matches_birthday(self, date_str: str) -> bool:
+        """True якщо дата збігається з датою народження."""
+        if not self.birthday:
+            return False
+        return str(self.birthday) == date_str
+
     def __str__(self):
         bday_str = f", birthday: {self.birthday}" if self.birthday else ""
-        return f"Contact name: {self.name.value}, phones: {'; '.join(p.value for p in self.phones)}{bday_str}"
+        return (
+            f"Contact name: {self.name.value}, "
+            f"phones: {'; '.join(p.value for p in self.phones)}"
+            f"{bday_str}"
+        )
+
