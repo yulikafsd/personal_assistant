@@ -290,8 +290,9 @@ def change_note(notes: Notes) -> str:
 def find_note_by_tag(notes: Notes) -> str:
     tag = input("Enter tag to find note: ")
     matched_notes = notes.find_note_by_tag(tag)
+    divider = "-"*40
     if matched_notes:
-        return "\n\n".join(str(note) for note in matched_notes)
+        return "\n".join(f"{divider}\n{str(note)}\n{divider}" for note in matched_notes)
     else:
         return f"No notes found with tag '{tag}'."
 
