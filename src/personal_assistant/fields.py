@@ -1,7 +1,8 @@
-from .errors import ValidationError
 from datetime import datetime
 from typing import Any
 import re
+
+from .errors import ValidationError
 
 
 class Field:
@@ -27,7 +28,7 @@ class Field:
     def update(self, new_value):
         self.value = self.validate(new_value)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.value)
 
 
@@ -37,7 +38,8 @@ class Field:
 
 
 class Name(Field):
-    """Uses default base validation."""
+    """Uses base validation only."""
+    pass
 
 
 class Phone(Field):
@@ -67,7 +69,7 @@ class Birthday(Field):
         except ValueError:
             raise ValidationError(f"Invalid date: {birthday}")
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.value.strftime("%d.%m.%Y")
 
 
@@ -94,13 +96,14 @@ class Title(Field):
 
 
 class Content(Field):
-    """Content may be empty, so override validation."""
-
+    """Text can be empty — this is allowed."""
     def validate(self, value):
-        return value  # no validation
+        return value
 
 
 class Tags(Field):
     def validate(self, value):
         value = self.base_validate(value)
         return value
+
+

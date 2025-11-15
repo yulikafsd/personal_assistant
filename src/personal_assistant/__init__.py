@@ -1,3 +1,4 @@
+# Основні імпорти модулів
 from .addressbook import AddressBook
 from .record import Record
 from .notes import Note, Notes
@@ -8,6 +9,7 @@ from .utils import input_error
 from .pickle_data import load_data, save_data
 from .input_parser import parse_input
 
+# Команди застосунку
 from .commands import (
     add_contact,
     change_contact,
@@ -29,8 +31,11 @@ from .commands import (
     change_note,
     find_note_by_tag,
     show_all_notes,
+    search_contacts,
+    show_help,
 )
 
+# Експортовані імена пакета
 __all__ = [
     "AddressBook",
     "Record",
@@ -70,4 +75,6 @@ __all__ = [
     "change_note",
     "find_note_by_tag",
     "show_all_notes",
+    "search_contacts",
+    "show_help",
 ]

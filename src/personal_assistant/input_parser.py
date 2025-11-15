@@ -1,6 +1,18 @@
-def parse_input(user_input):
-    if not user_input.strip():
+def parse_input(user_input: str):
+    """
+    Розбирає введення користувача:
+    - повертає назву команди (cmd)
+    - та список аргументів (args: list[str])
+    """
+    user_input = user_input.strip()
+    if not user_input:
         return "", []
-    cmd, *args = user_input.split()
-    cmd = cmd.strip().lower()
-    return cmd, *args
+
+    parts = user_input.split()
+    cmd = parts[0].strip().lower()
+    args = parts[1:]
+
+    return cmd, args
+
+
+

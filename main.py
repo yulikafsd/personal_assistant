@@ -2,7 +2,7 @@ import sys
 
 sys.path.append("src")
 
-# перед здачею проєкту видалити 1-3 строки та встановлюти пакет локально командою:
+# перед здачею проєкту видалити 1–3 рядки та встановити пакет локально:
 # pip install -e src/
 
 from personal_assistant import (
@@ -30,22 +30,28 @@ from personal_assistant import (
     change_note,
     find_note_by_tag,
     show_all_notes,
+    search_contacts,
+    show_help,
 )
 
 
 def main():
+    # завантаження даних контактів та нотаток
     book, notes = load_data()
 
     print("Welcome to the assistant bot!")
 
     while True:
+        # читаю команду від користувача
         user_input = input("Enter a command: ")
-        command, *args = parse_input(user_input)
+        # розбираю команду та аргументи
+        command, args = parse_input(user_input)
 
         if not command:
             continue
 
         match command:
+
             case "close" | "exit":
                 print("Good bye!")
                 save_data(book, notes)
@@ -53,6 +59,10 @@ def main():
 
             case "hello":
                 print("How can I help you?")
+
+            case "help":
+                # виведення довідки по доступним командам
+                print(show_help())
 
             case "add":
                 print(add_contact(args, book))
@@ -95,6 +105,10 @@ def main():
 
             case "birthdays":
                 print(birthdays(args, book))
+
+            case "search":
+                # пошук по телефону / email / даті народження
+                print(search_contacts(args, book))
 
             case "add-note":
                 print(add_note(notes))
