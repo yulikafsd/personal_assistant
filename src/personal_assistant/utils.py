@@ -2,7 +2,7 @@ def input_error(func):
     def inner(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except ValueError:
+        except ValueError as e:
             match func.__name__:
                 case "add_contact":
                     return "Wrong format. Usage: add [contact_name] [phone_number]"
@@ -24,6 +24,8 @@ def input_error(func):
                     return "Wrong format. Usage: add-address [contact_name] [address]"
                 case "birthdays":
                     return "Wrong format. Usage: birthdays [dates_from_today] - must be an integer"
+                case "add_note" | "find_note_by_title" | "delete_note" | "change_note" | "find_note_by_tag":
+                    return e
                 case _:
                     return "ValueError"
         except KeyError:
