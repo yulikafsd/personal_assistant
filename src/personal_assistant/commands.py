@@ -1,10 +1,14 @@
+from typing import Any, Callable
+
 from .utils import input_error
 from .addressbook import AddressBook
 from .record import Record
 from .notes import Notes
-from typing import Any, Callable
 
 
+# ============================
+# 📇 Контакти
+# ============================
 @input_error
 def add_contact(args, book: AddressBook):
     name, phone, *_ = args
@@ -14,13 +18,13 @@ def add_contact(args, book: AddressBook):
     if not record:
         record = Record(name_capitalized)
         book.add_record(record)
-
     else:
         user_input = input(
             f"Contact {name_capitalized} already exists.\nAdd another phone number to the contact? Y/N: "
         )
         if user_input.lower() == "n":
             return "Nothing changed"
+
     return record.add_phone(phone)
 
 
@@ -29,6 +33,7 @@ def change_contact(args, book: AddressBook):
     name, old_phone, new_phone, *_ = args
     name_capitalized = name.capitalize()
     record = book.find(name_capitalized)
+
     if not record:
         user_input = input(
             f"Contact with name {name_capitalized} was not found.\nAdd a new contact? Y/N: "
@@ -37,6 +42,7 @@ def change_contact(args, book: AddressBook):
             return add_contact([name_capitalized, new_phone], book)
         else:
             return "Nothing changed"
+
     return record.edit_phone(old_phone, new_phone)
 
 
@@ -59,21 +65,17 @@ def _show_generic(
     display_func: Callable[[Any], str] = str,
     plural_name: str | None = None,
 ) -> str:
-    """Універсальний хелпер для show_* полів.
-
-    Args:
-        record: Record об'єкт.
-        field_name: назва атрибуту Record ('phones', 'emails', 'birthday', 'address').
-        display_func: функція для перетворення значення в рядок.
-        plural_name: як називати поле в рядку (для мн. числа, напр. 'phone(s)').
-    """
+    """Універсальний хелпер для show_* полів."""
     value = getattr(record, field_name)
 
     if not value:
         return f"{record.name.value} has no {plural_name or field_name} yet."
 
     if isinstance(value, list):
-        return f"{record.name.value}'s {plural_name or field_name}: {', '.join(display_func(v) for v in value)}"
+        return (
+            f"{record.name.value}'s {plural_name or field_name}: "
+            f"{', '.join(display_func(v) for v in value)}"
+        )
 
     return f"{record.name.value}'s {plural_name or field_name}: {display_func(value)}"
 
@@ -133,7 +135,7 @@ def show_contact(args, book: AddressBook):
     ]
 
     results = []
-    for label, func in fields:
+    for _, func in fields:
         info = func(record)
         # Пропускаємо поля, що повертають 'has no ...'
         if "has no" not in info:
@@ -142,7 +144,6 @@ def show_contact(args, book: AddressBook):
     if not results:
         return f"{record.name.value} has no info yet."
 
-    # Додаємо роздільники між полями
     return "---\n" + "\n".join(results) + "\n---"
 
 
@@ -153,8 +154,16 @@ def show_all(book: AddressBook):
     return "\n".join(str(record) for record in book.data.values())
 
 
+# ============================
+# 🏠 Address
+# ============================
 @input_error
-def add_address(args, book: AddressBook):
+def add_address(args, book: AddressBook) -> str:
+    """
+    Додати/оновити адресу контакта.
+
+    Виклик: add-address <name> <address...>
+    """
     if len(args) < 2:
         return "You must provide name and address."
 
@@ -169,6 +178,9 @@ def add_address(args, book: AddressBook):
     return record.add_address(address)
 
 
+# ============================
+# ✉ Email-и
+# ============================
 @input_error
 def add_email(args, book: AddressBook):
     name, email, *_ = args
@@ -222,6 +234,9 @@ def delete_email(args, book: AddressBook):
     return result
 
 
+# ============================
+# 🎂 Дні народження
+# ============================
 @input_error
 def add_birthday(args, book: AddressBook):
     name, new_birthday, *_ = args
@@ -246,6 +261,64 @@ def birthdays(args, book: AddressBook):
     )
 
 
+# ============================
+# 🔍 Пошук контактів (phone/email/birthday)
+# ============================
+@input_error
+def search_contacts(args, book: AddressBook) -> str:
+    """
+    search <field> <value>
+    field: phone / email / birthday
+    birthday: у форматі DD.MM.YYYY
+    """
+    if len(args) < 2:
+        return "Вкажіть поле та значення для пошуку. Наприклад: search phone 1234567890"
+
+    field, value, *_ = args
+    field = field.lower().strip()
+    value = value.strip()
+
+    found_records = []
+
+    for record in book.data.values():
+        # Пошук за телефоном
+        if field in ("phone", "tel"):
+            for phone in record.phones:
+                if phone.value == value:
+                    found_records.append(str(record))
+                    break
+
+        # Пошук за email
+        elif field in ("email", "mail"):
+            email_obj = getattr(record, "emails", None)
+            if email_obj:
+                for e in email_obj:
+                    if getattr(e, "value", None) == value:
+                        found_records.append(str(record))
+                        break
+
+        # Пошук за днем народження (формат DD.MM.YYYY)
+        elif field in ("birthday", "bday", "bd"):
+            if record.birthday:
+                bday_obj = getattr(record.birthday, "value", record.birthday)
+                try:
+                    bday_str = bday_obj.strftime("%d.%m.%Y")
+                except AttributeError:
+                    bday_str = str(record.birthday)
+                if bday_str == value:
+                    found_records.append(str(record))
+        else:
+            return "Невідоме поле для пошуку. Доступні: phone, email, birthday."
+
+    if not found_records:
+        return "Контакти за заданими критеріями не знайдені."
+
+    return "Знайдені контакти:\n" + "\n".join(found_records)
+
+
+# ============================
+# 📝 Нотатки
+# ============================
 @input_error
 def add_note(notes: Notes) -> str:
     title = input("Enter note title: ")
@@ -299,3 +372,39 @@ def find_note_by_tag(notes: Notes) -> str:
 @input_error
 def show_all_notes(notes: Notes) -> str:
     return notes.show_all_notes()
+
+
+# ============================
+# ❓ HELP
+# ============================
+@input_error
+def show_help(*args, **kwargs) -> str:
+    """
+    Повертає список доступних команд.
+    """
+    return (
+        "Доступні команди:\n"
+        "  add <name> <phone>                – додати контакт або телефон до існуючого\n"
+        "  change <name> <old> <new>         – змінити номер телефону\n"
+        "  delete <name>                     – видалити контакт\n"
+        "  phone <name>                      – показати телефони контакту\n"
+        "  email <name>                      – показати email-и контакту\n"
+        "  birthday <name>                   – показати день народження контакту\n"
+        "  contact <name>                    – показати всі дані контакту\n"
+        "  all                               – показати всі контакти\n"
+        "  add-address <name> <address>      – додати/оновити адресу контакта\n"
+        "  add-email <name> <email>          – додати email контакту\n"
+        "  change-email <name> <old> <new>   – змінити email контакту\n"
+        "  delete-email <name> <email>       – видалити email контакту\n"
+        "  add-birthday <name> <DD.MM.YYYY>  – додати день народження\n"
+        "  birthdays [days]                  – дні народження впродовж N днів (7 за замовчуванням)\n"
+        "  search <field> <value>            – пошук за phone / email / birthday\n"
+        "  add-note                          – додати нотатку\n"
+        "  change-note                       – змінити нотатку\n"
+        "  delete-note                       – видалити нотатку\n"
+        "  find-note-by-title                – знайти нотатку за заголовком\n"
+        "  find-note-by-tag                  – знайти нотатку за тегом\n"
+        "  all-notes                         – показати всі нотатки\n"
+        "  help                              – показати цю довідку\n"
+        "  exit | close                      – вийти з помічника\n"
+    )
