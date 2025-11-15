@@ -5,18 +5,22 @@ sys.path.append("src")
 # перед здачею проєкту видалити 1–3 рядки та встановити пакет локально:
 # pip install -e src/
 
-from enum import Enum
-
 from personal_assistant import (
-    AddressBook,
-    Record,
+    Command_Use,
     load_data,
     save_data,
     parse_input,
     add_contact,
     change_contact,
+    delete_contact,
     show_phone,
+    show_email,
+    show_contact,
     show_all,
+    add_address,
+    add_email,
+    change_email,
+    delete_email,
     add_birthday,
     show_birthday,
     birthdays,
@@ -26,32 +30,9 @@ from personal_assistant import (
     change_note,
     find_note_by_tag,
     show_all_notes,
-    add_address,        # команда для роботи з адресами
-    search_contacts,    # команда пошуку (phone/email/birthday)
-    show_help,          # команда виводу довідки
+    search_contacts,
+    show_help,
 )
-
-
-class Command_Use(Enum):
-    ADD = "add [name] [phone]"
-    CHANGE = "change [name] [old_phone] [new_phone]"
-    PHONE = "phone [name]"
-    ALL = "all"
-    ADD_ADDRESS = "add-address [name] [address]"
-    ADD_BIRTHDAY = "add-birthday [name] [birthday]"
-    SHOW_BIRTHDAY = "show-birthday [name]"
-    BIRTHDAYS = "birthdays"
-    ADD_NOTE = "add-note"
-    FIND_NOTE_BY_TITLE = "find-note-by-title"
-    DELETE_NOTE = "delete-note"
-    CHANGE_NOTE = "change-note"
-    FIND_NOTE_BY_TAG = "find-note-by-tag"
-    ALL_NOTES = "all-notes"
-    SEARCH = "search [field] [value]"   # команда пошуку
-    HELP = "help"                       # команда для виводу довідки
-    HELLO = "hello"
-    CLOSE = "close"
-    EXIT = "exit"
 
 
 def main():
@@ -89,24 +70,41 @@ def main():
             case "change":
                 print(change_contact(args, book))
 
+            case "delete":
+                print(delete_contact(args, book))
+
             case "phone":
                 print(show_phone(args, book))
+
+            case "email":
+                print(show_email(args, book))
+
+            case "birthday":
+                print(show_birthday(args, book))
+
+            case "contact":
+                print(show_contact(args, book))
 
             case "all":
                 print(show_all(book))
 
             case "add-address":
-                # додавання або оновлення адреси
                 print(add_address(args, book))
+
+            case "add-email":
+                print(add_email(args, book))
+
+            case "change-email":
+                print(change_email(args, book))
+
+            case "delete-email":
+                print(delete_email(args, book))
 
             case "add-birthday":
                 print(add_birthday(args, book))
 
-            case "show-birthday":
-                print(show_birthday(args, book))
-
             case "birthdays":
-                print(birthdays(book))
+                print(birthdays(args, book))
 
             case "search":
                 # пошук по телефону / email / даті народження
@@ -138,6 +136,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-

@@ -1,8 +1,10 @@
 # Основні імпорти модулів
 from .addressbook import AddressBook
 from .record import Record
-from .fields import Name, Phone, Birthday
+from .notes import Note, Notes
+from .fields import Name, Phone, Birthday, Address, Email, Title, Content, Tags
 from .errors import ValidationError
+from .command_use import Command_Use
 from .utils import input_error
 from .pickle_data import load_data, save_data
 from .input_parser import parse_input
@@ -11,10 +13,17 @@ from .input_parser import parse_input
 from .commands import (
     add_contact,
     change_contact,
+    delete_contact,
     show_phone,
-    show_all,
-    add_birthday,
+    show_email,
     show_birthday,
+    show_contact,
+    show_all,
+    add_address,
+    add_email,
+    change_email,
+    delete_email,
+    add_birthday,
     birthdays,
     add_note,
     find_note_by_title,
@@ -22,9 +31,8 @@ from .commands import (
     change_note,
     find_note_by_tag,
     show_all_notes,
-    add_address,       # додавання або оновлення адреси
-    search_contacts,   # пошук контактів
-    show_help,         # команда виводу help
+    search_contacts,
+    show_help,
 )
 
 # Експортовані імена пакета
@@ -34,17 +42,32 @@ __all__ = [
     "Name",
     "Phone",
     "Birthday",
+    "Address",
+    "Email",
+    "Title",
+    "Content",
+    "Tags",
+    "Note",
+    "Notes",
     "ValidationError",
+    "Command_Use",
     "input_error",
     "load_data",
     "save_data",
     "parse_input",
     "add_contact",
     "change_contact",
+    "delete_contact",
     "show_phone",
-    "show_all",
-    "add_birthday",
+    "show_email",
     "show_birthday",
+    "show_contact",
+    "show_all",
+    "add_address",
+    "add_email",
+    "change_email",
+    "delete_email",
+    "add_birthday",
     "birthdays",
     "add_note",
     "find_note_by_title",
@@ -52,8 +75,6 @@ __all__ = [
     "change_note",
     "find_note_by_tag",
     "show_all_notes",
-    "add_address",
     "search_contacts",
     "show_help",
 ]
-

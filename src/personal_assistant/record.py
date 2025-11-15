@@ -1,18 +1,20 @@
-from .fields import Name, Phone, Birthday, Address
+from .fields import Name, Phone, Birthday, Address, Email
 from .errors import ValidationError
 
 
 class Record:
     def __init__(self, name):
         self.name = Name(name)
-        self.phones = []
-        self.birthday = None
-        self.address = None
+        self.phones: list[Phone] = []
+        self.birthday: Birthday | None = None  # необов'язкове, тільки одне
+        self.address: Address | None = None    # необов'язкова адреса
+        self.emails: list[Email] = []          # список email-адрес
 
+    # ---------------- Phones ----------------
     def add_phone(self, number: str):
-        for phone_obj in self.phones:
-            if phone_obj.value == number:
-                return f"{self.name.value}'s record already has the number: {number}"
+        # перевіряємо, чи номер уже є в списку
+        if any(phone_obj.value == number for phone_obj in self.phones):
+            return f"{self.name.value}'s record already has the number: {number}"
 
         try:
             self.phones.append(Phone(number))
@@ -20,65 +22,81 @@ class Record:
         except ValidationError as e:
             return f"ERROR! No phone number was added! {e}"
 
-    def wrong_phone_alert(self, phone):
-        return (
-            f"User {self.name} has no phone {phone}.\n"
-            f"Please, choose one of the existing phone numbers:\n"
-            f"{chr(10).join(p.value for p in self.phones)}"
-        )
-
-    def edit_phone(self, old_phone, new_phone):
+    def edit_phone(self, old_phone: str, new_phone: str):
         for phone_obj in self.phones:
             if phone_obj.value == old_phone:
                 try:
                     phone_obj.update(new_phone)
                     return f"{self.name.value}'s record was updated with a new number: {new_phone}"
                 except ValidationError as e:
-                    return f"ERROR! {e}"
-        return self.wrong_phone_alert(old_phone)
+                    return f"ERROR! No phone number was added! {e}"
 
-    def find_phone(self, searched_phone):
+        return f"User {self.name.value} has no phone {old_phone}."
+
+    # ---------------- Emails ----------------
+    def add_email(self, email: str):
+        """Додає новий email до списку, якщо його ще немає."""
         try:
-            found_phone = list(
-                filter(lambda phone: phone.value == searched_phone, self.phones)
-            )[0]
-            return found_phone
-        except IndexError:
-            return self.wrong_phone_alert(searched_phone)
+            email_obj = Email(email)
+        except ValidationError as e:
+            return f"ERROR! No email was added! {e}"
 
-    def remove_phone(self, number):
-        for phone_obj in self.phones:
-            if phone_obj.value == number:
-                self.phones.remove(phone_obj)
-                return (
-                    f"User {self.name}'s phone {number} was removed.\n"
-                    f"The remaining phone numbers are:\n"
-                    f"{chr(10).join(p.value for p in self.phones)}"
+        if any(e.value == email_obj.value for e in self.emails):
+            return (
+                f"{self.name.value}'s record already has the email: {email_obj.value}"
+            )
+
+        self.emails.append(email_obj)
+        return f"{self.name.value}'s record was updated with a new email: {email_obj.value}"
+
+    def edit_email(self, old_email: str, new_email: str):
+        for email_obj in self.emails:
+            if email_obj.value == old_email:
+                try:
+                    email_obj.update(new_email)
+                    return (
+                        f"{self.name.value}'s email was changed from "
+                        f"{old_email} to {new_email}"
+                    )
+                except ValidationError as e:
+                    return f"ERROR! No email was changed! {e}"
+
+        return f"User {self.name.value} has no email {old_email}."
+
+    def remove_email(self, email: str):
+        for email_obj in self.emails:
+            if email_obj.value == email:
+                self.emails.remove(email_obj)
+                remaining = (
+                    ", ".join(e.value for e in self.emails) if self.emails else "None"
                 )
-        return self.wrong_phone_alert(number)
+                return (
+                    f"Email '{email}' was removed from {self.name.value}'s record.\n"
+                    f"Remaining emails: {remaining}"
+                )
 
-    def add_birthday(self, birthday):
+        return f"{self.name.value} has no email '{email}'."
+
+    # ---------------- Birthday ----------------
+    def add_birthday(self, birthday: str):
         if self.birthday is None:
             try:
                 self.birthday = Birthday(birthday)
-                return f"Birthday {birthday} is added to {self.name}'s record"
+                return f"Birthday {birthday} is added to {self.name.value}'s record"
             except ValidationError as e:
                 return f"ERROR! {e}"
-            except ValueError as e:
-                return f"ERROR! Please, choose a real date, {e}"
+        else:
+            user_input = input(
+                f"{self.name.value} already has a birthday.\nChange it? Y/N: "
+            )
+            if user_input.lower() == "n":
+                return "Nothing changed"
 
-        user_input = input(
-            f"Contact {self.name.value} already has a birthday record.\n"
-            f"Would you like to change it? Y/N: "
-        )
-        if user_input.lower() == "n":
-            return "Nothing changed"
-
-        try:
-            self.birthday = Birthday(birthday)
-            return f"Birth date of {self.name.value} was changed to {birthday}"
-        except ValidationError as e:
-            return f"ERROR! {e}"
+            try:
+                self.birthday = Birthday(birthday)
+                return f"Birth date of {self.name.value} was changed to {birthday}"
+            except ValidationError as e:
+                return f"ERROR! {e}"
 
     # ============================
     # Методи для пошуку
@@ -86,10 +104,13 @@ class Record:
     def matches_phone(self, phone: str) -> bool:
         return any(p.value == phone for p in self.phones)
 
+    def matches_email(self, email: str) -> bool:
+        return any(e.value == email for e in self.emails)
+
     def matches_birthday(self, date_str: str) -> bool:
         if not self.birthday:
             return False
-        return str(self.birthday) == date_str
+        return str(self.birthday) == date_str  # Birthday.__str__ → "DD.MM.YYYY"
 
     # ============================
     # Address
@@ -101,13 +122,19 @@ class Record:
         except ValidationError as e:
             return f"ERROR! {e}"
 
+    # ---------------- String ----------------
     def __str__(self):
-        phones_str = "; ".join(p.value for p in self.phones) if self.phones else "no phones"
+        phones_str = (
+            f", phone(s): {'; '.join(p.value for p in self.phones)}"
+            if self.phones
+            else ""
+        )
+        emails_str = (
+            f", email(s): {'; '.join(e.value for e in self.emails)}"
+            if self.emails
+            else ""
+        )
         bday_str = f", birthday: {self.birthday}" if self.birthday else ""
         address_str = f", address: {self.address.value}" if self.address else ""
-        return (
-            f"Contact name: {self.name.value}, "
-            f"phones: {phones_str}"
-            f"{bday_str}"
-            f"{address_str}"
-        )
+        return f"Contact name: {self.name.value}{phones_str}{emails_str}{bday_str}{address_str}"
+

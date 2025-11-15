@@ -1,5 +1,5 @@
 from collections import UserDict
-from datetime import datetime, timedelta
+from datetime import datetime, date
 
 from .record import Record
 from .errors import ValidationError
@@ -21,34 +21,46 @@ class AddressBook(UserDict):
         del self.data[name]
         return f"{name} deleted from contacts"
 
-    def get_upcoming_birthdays(self) -> list[dict]:
-        current_date = datetime.today().date()
+    def get_upcoming_birthdays(self, days_from_today: int) -> list[dict]:
+        """
+        Повертає список контактів, у яких день народження
+        в проміжку [сьогодні; сьогодні + days_from_today].
+        """
+        today = datetime.today().date()
+        current_year = today.year
+
         upcoming_birthdays: list[dict] = []
 
         for record in self.data.values():
-            if record.birthday:
-                contact_bd = record.birthday.value.date()
-                current_year = current_date.year
-                is_coming = contact_bd.replace(year=current_year) >= current_date
-                congratulation_year = (
-                    current_year if is_coming else current_date.year + 1
-                )
-                congratulation_date = contact_bd.replace(year=congratulation_year)
-                is_next_week = 0 < (congratulation_date - current_date).days <= 7
+            # якщо в записі немає дня народження — пропускаємо
+            if not record.birthday:
+                continue
 
-                if is_next_week:
-                    bd_weekday = congratulation_date.weekday()
-                    if bd_weekday == 5:  # субота
-                        congratulation_date += timedelta(days=2)
-                    if bd_weekday == 6:  # неділя
-                        congratulation_date += timedelta(days=1)
+            bd = record.birthday.value.date()
 
-                    congrat_date_string = congratulation_date.strftime("%d.%m.%Y")
-                    coming_bd = {
+            # 29 лютого — окремий випадок
+            try:
+                next_bd = bd.replace(year=current_year)
+            except ValueError:
+                # Для дати 29.02 використовуємо 28.02
+                next_bd = date(current_year, 2, 28)
+
+            # Якщо день народження вже був цього року — переносимо на наступний
+            if next_bd < today:
+                try:
+                    next_bd = bd.replace(year=current_year + 1)
+                except ValueError:
+                    next_bd = date(current_year + 1, 2, 28)
+
+            delta_days = (next_bd - today).days
+
+            if 0 <= delta_days <= days_from_today:
+                upcoming_birthdays.append(
+                    {
                         "name": record.name.value,
-                        "congratulation_date": congrat_date_string,
+                        "congratulation_date": next_bd.strftime("%d.%m.%Y"),
                     }
-                    upcoming_birthdays.append(coming_bd)
+                )
 
         return upcoming_birthdays
 
