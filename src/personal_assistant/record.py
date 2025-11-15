@@ -57,12 +57,15 @@ class Record:
                     return f"ERROR! No email was changed! {e}"
         return f"User {self.name.value} has no email {old_email}."
 
-    def show_email(self):
-        if not self.emails:
-            return f"{self.name.value} has no email yet."
-        return (
-            f"{self.name.value}'s email(s): {', '.join(e.value for e in self.emails)}"
-        )
+    def remove_email(self, email):
+        for email_obj in self.emails:
+            if email_obj.value == email:
+                self.emails.remove(email_obj)
+                return (
+                    f"Email '{email}' was removed from {self.name.value}'s record.\n"
+                    f"Remaining emails: {', '.join(e.value for e in self.emails) if self.emails else 'None'}"
+                )
+        return f"{self.name.value} has no email '{email}'."
 
     # ---------------- Birthday ----------------
     def add_birthday(self, birthday):
