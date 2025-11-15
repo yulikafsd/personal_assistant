@@ -5,20 +5,22 @@ sys.path.append("src")
 # перед здачею проєкту видалити 1-3 строки та встановлюти пакет локально командою:
 # pip install -e src/
 
-
-from enum import Enum
 from personal_assistant import (
+    Command_Use,
     load_data,
     save_data,
     parse_input,
     add_contact,
     change_contact,
+    delete_contact,
     show_phone,
+    show_email,
+    show_contact,
     show_all,
     add_address,
     add_email,
     change_email,
-    show_email,
+    delete_email,
     add_birthday,
     show_birthday,
     birthdays,
@@ -29,37 +31,6 @@ from personal_assistant import (
     find_note_by_tag,
     show_all_notes,
 )
-
-
-class Command_Use(Enum):
-    ADD = "add [name] [phone]"
-    CHANGE = "change [name] [old_phone] [new_phone]"
-    PHONE = "phone [name]"
-    ALL = "all"
-    ADD_ADDRESS = "add-address [name] [address]"
-
-    # ---------------- Emails ----------------
-    ADD_EMAIL = "add-email [name] [email]"
-    CHANGE_EMAIL = "change-email [name] [old_email] [new_email]"
-    SHOW_EMAIL = "show-email [name]"
-
-    # ---------------- Birthdays ----------------
-    ADD_BIRTHDAY = "add-birthday [name] [birthday]"
-    SHOW_BIRTHDAY = "show-birthday [name]"
-    BIRTHDAYS = "birthdays"
-
-    # ---------------- Notes ----------------
-    ADD_NOTE = "add-note"
-    FIND_NOTE_BY_TITLE = "find-note-by-title"
-    DELETE_NOTE = "delete-note"
-    CHANGE_NOTE = "change-note"
-    FIND_NOTE_BY_TAG = "find-note-by-tag"
-    ALL_NOTES = "all-notes"
-
-    # ---------------- General ----------------
-    HELLO = "hello"
-    CLOSE = "close"
-    EXIT = "exit"
 
 
 def main():
@@ -89,8 +60,20 @@ def main():
             case "change":
                 print(change_contact(args, book))
 
+            case "delete":
+                print(delete_contact(args, book))
+
             case "phone":
                 print(show_phone(args, book))
+
+            case "email":
+                print(show_email(args, book))
+
+            case "birthday":
+                print(show_birthday(args, book))
+
+            case "contact":
+                print(show_contact(args, book))
 
             case "all":
                 print(show_all(book))
@@ -104,14 +87,11 @@ def main():
             case "change-email":
                 print(change_email(args, book))
 
-            case "show-email":
-                print(show_email(args, book))
+            case "delete-email":
+                print(delete_email(args, book))
 
             case "add-birthday":
                 print(add_birthday(args, book))
-
-            case "show-birthday":
-                print(show_birthday(args, book))
 
             case "birthdays":
                 print(birthdays(args, book))

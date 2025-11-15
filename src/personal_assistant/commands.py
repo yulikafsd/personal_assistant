@@ -2,6 +2,7 @@ from .utils import input_error
 from .addressbook import AddressBook
 from .record import Record
 from .notes import Notes
+from typing import Any, Callable
 
 
 @input_error
@@ -40,17 +41,109 @@ def change_contact(args, book: AddressBook):
 
 
 @input_error
-def show_phone(args, book: AddressBook):
-    name = args[0]
-    name_capitalized = name.capitalize()
-    record = book.find(name_capitalized)
+def delete_contact(args, book: AddressBook):
+    if not args:
+        raise IndexError
+    name = args[0].capitalize()
+    record = book.find(name)
     if not record:
-        return f"Contact with name {name_capitalized} was not found"
-    return (
-        f"{name_capitalized}'s phone(s): {', '.join([p.value for p in record.phones])}"
-        if record.phones
-        else f"{name_capitalized} has no phone numbers yet."
+        return f"Contact with name {name} was not found."
+    book.delete(name)
+    return f"Contact {name} was deleted successfully."
+
+
+# ----------------------- Хелпери для відображення -----------------------
+def _show_generic(
+    record: Any,
+    field_name: str,
+    display_func: Callable[[Any], str] = str,
+    plural_name: str | None = None,
+) -> str:
+    """Універсальний хелпер для show_* полів.
+
+    Args:
+        record: Record об'єкт.
+        field_name: назва атрибуту Record ('phones', 'emails', 'birthday', 'address').
+        display_func: функція для перетворення значення в рядок.
+        plural_name: як називати поле в рядку (для мн. числа, напр. 'phone(s)').
+    """
+    value = getattr(record, field_name)
+
+    if not value:
+        return f"{record.name.value} has no {plural_name or field_name} yet."
+
+    if isinstance(value, list):
+        return f"{record.name.value}'s {plural_name or field_name}: {', '.join(display_func(v) for v in value)}"
+
+    return f"{record.name.value}'s {plural_name or field_name}: {display_func(value)}"
+
+
+def _show_field(args, book, show_func):
+    """Універсальна обгортка для show_* команд."""
+    name = args[0].capitalize()
+    record = book.find(name)
+    if not record:
+        return f"Contact with name {name} was not found."
+    return show_func(record)
+
+
+# ----------------------- Show команди -----------------------
+@input_error
+def show_phone(args, book: AddressBook):
+    return _show_field(
+        args, book, lambda r: _show_generic(r, "phones", lambda p: p.value, "phone(s)")
     )
+
+
+@input_error
+def show_email(args, book: AddressBook):
+    return _show_field(
+        args, book, lambda r: _show_generic(r, "emails", lambda e: e.value, "email(s)")
+    )
+
+
+@input_error
+def show_birthday(args, book: AddressBook):
+    return _show_field(
+        args, book, lambda r: _show_generic(r, "birthday", lambda b: str(b))
+    )
+
+
+@input_error
+def show_address(args, book: AddressBook):
+    return _show_field(
+        args, book, lambda r: _show_generic(r, "address", lambda a: a.value)
+    )
+
+
+# ----------------------- Show contact (усі поля разом) -----------------------
+@input_error
+def show_contact(args, book: AddressBook):
+    """Показує всі дані контакта в одному рядку, пропускаючи порожні поля."""
+    name = args[0].capitalize()
+    record = book.find(name)
+    if not record:
+        return f"Contact with name {name} was not found."
+
+    fields = [
+        ("Phones", lambda r: _show_generic(r, "phones", lambda p: p.value, "phone(s)")),
+        ("Emails", lambda r: _show_generic(r, "emails", lambda e: e.value, "email(s)")),
+        ("Birthday", lambda r: _show_generic(r, "birthday", lambda b: str(b))),
+        ("Address", lambda r: _show_generic(r, "address", lambda a: a.value)),
+    ]
+
+    results = []
+    for label, func in fields:
+        info = func(record)
+        # Пропускаємо поля, що повертають 'has no ...'
+        if "has no" not in info:
+            results.append(info)
+
+    if not results:
+        return f"{record.name.value} has no info yet."
+
+    # Додаємо роздільники між полями
+    return "---\n" + "\n".join(results) + "\n---"
 
 
 @input_error
@@ -117,20 +210,16 @@ def change_email(args, book: AddressBook):
 
 
 @input_error
-def show_email(args, book: AddressBook):
-    name = args[0]
+def delete_email(args, book: AddressBook):
+    name, email, *_ = args
     name_capitalized = name.capitalize()
+
     record = book.find(name_capitalized)
-
     if not record:
-        return f"Contact with name {name_capitalized} was not found."
+        return f"Contact {name_capitalized} was not found."
 
-    if not record.emails:
-        return f"{name_capitalized} has no email yet."
-
-    return (
-        f"{name_capitalized}'s email(s): {', '.join([e.value for e in record.emails])}"
-    )
+    result = record.remove_email(email)
+    return result
 
 
 @input_error
@@ -141,18 +230,6 @@ def add_birthday(args, book: AddressBook):
     if not record:
         return f"Contact with name {name_capitalized} was not found."
     return record.add_birthday(new_birthday)
-
-
-@input_error
-def show_birthday(args, book: AddressBook):
-    name = args[0]
-    name_capitalized = name.capitalize()
-    record = book.find(name_capitalized)
-    if not record:
-        return f"Contact with name {name_capitalized} was not found."
-    if not record.birthday:
-        return f"Contact {name_capitalized} has no birthday yet"
-    return f"{name_capitalized}'s birthday: {record.birthday}"
 
 
 @input_error
