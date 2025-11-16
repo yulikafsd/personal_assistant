@@ -1,5 +1,6 @@
 from .fields import Name, Phone, Birthday, Address, Email
 from .errors import ValidationError
+from .colorize import Colorize
 
 
 class Record:
@@ -33,17 +34,17 @@ class Record:
         try:
             phone_obj = Phone(number)  # тут відбувається валідація + нормалізація
         except ValidationError as e:
-            return f"ERROR! No phone number was added! {e}"
+            return Colorize.error(f"ERROR! No phone number was added! {e}")
 
         # Порівнюємо за нормалізованим значенням (phone_obj.value)
         if any(p.value == phone_obj.value for p in self.phones):
-            return (
+            return Colorize.error(
                 f"{self.name.value}'s record already has the number: "
                 f"{phone_obj.value}"
             )
 
         self.phones.append(phone_obj)
-        return (
+        return Colorize.success(
             f"{self.name.value}'s record was updated with a new number: "
             f"{phone_obj.value}"
         )
@@ -70,17 +71,17 @@ class Record:
                 break
 
         if not target_phone:
-            return f"User {self.name.value} has no phone {old_phone}."
+            return Colorize.error(f"User {self.name.value} has no phone {old_phone}.")
 
         # Оновлюємо новим номером (всередині знову валідатор + нормалізація)
         try:
             target_phone.update(new_phone)
-            return (
+            return Colorize.success(
                 f"{self.name.value}'s record was updated with a new number: "
                 f"{target_phone.value}"
             )
         except ValidationError as e:
-            return f"ERROR! No phone number was changed! {e}"
+            return Colorize.error(f"ERROR! No phone number was changed! {e}")
 
     # ============================
     #            EMAILS
@@ -91,13 +92,13 @@ class Record:
         try:
             email_obj = Email(email)
         except ValidationError as e:
-            return f"ERROR! No email was added! {e}"
+            return Colorize.error(f"ERROR! No email was added! {e}")
 
         if any(e.value == email_obj.value for e in self.emails):
-            return f"{self.name.value}'s record already has the email: {email_obj.value}"
+            return Colorize.error(f"{self.name.value}'s record already has the email: {email_obj.value}")
 
         self.emails.append(email_obj)
-        return f"{self.name.value}'s record was updated with a new email: {email_obj.value}"
+        return Colorize.success(f"{self.name.value}'s record was updated with a new email: {email_obj.value}")
 
     def edit_email(self, old_email: str, new_email: str):
         """Changes existing email."""
@@ -105,14 +106,14 @@ class Record:
             if email_obj.value == old_email:
                 try:
                     email_obj.update(new_email)
-                    return (
+                    return Colorize.success(
                         f"{self.name.value}'s email was changed from "
                         f"{old_email} to {new_email}"
                     )
                 except ValidationError as e:
-                    return f"ERROR! No email was changed! {e}"
+                    return Colorize.error(f"ERROR! No email was changed! {e}")
 
-        return f"User {self.name.value} has no email {old_email}."
+        return Colorize.error(f"User {self.name.value} has no email {old_email}.")
 
     def remove_email(self, email: str):
         """Deletes email from record."""
@@ -120,12 +121,12 @@ class Record:
             if email_obj.value == email:
                 self.emails.remove(email_obj)
                 remaining = ", ".join(e.value for e in self.emails) if self.emails else "None"
-                return (
+                return Colorize.success(
                     f"Email '{email}' was removed from {self.name.value}'s record.\n"
                     f"Remaining emails: {remaining}"
                 )
 
-        return f"{self.name.value} has no email '{email}'."
+        return Colorize.error(f"{self.name.value} has no email '{email}'.")
 
     # ============================
     #          BIRTHDAY
@@ -136,21 +137,21 @@ class Record:
         if self.birthday is None:
             try:
                 self.birthday = Birthday(birthday)
-                return f"Birthday {birthday} is added to {self.name.value}'s record"
+                return Colorize.success(f"Birthday {birthday} is added to {self.name.value}'s record")
             except ValidationError as e:
-                return f"ERROR! {e}"
+                return Colorize.error(f"ERROR! {e}")
 
         user_input = input(
-            f"{self.name.value} already has a birthday.\nChange it? Y/N: "
+            Colorize.warning(f"{self.name.value} already has a birthday.\nChange it? Y/N: ")
         )
         if user_input.lower() == "n":
-            return "Nothing changed"
+            return Colorize.info("Nothing changed")
 
         try:
             self.birthday = Birthday(birthday)
-            return f"Birth date of {self.name.value} was changed to {birthday}"
+            return Colorize.success(f"Birth date of {self.name.value} was changed to {birthday}")
         except ValidationError as e:
-            return f"ERROR! {e}"
+            return Colorize.error(f"ERROR! {e}")
 
     # ============================
     #           SEARCH HELPERS
@@ -193,9 +194,9 @@ class Record:
         """Sets or updates address."""
         try:
             self.address = Address(address)
-            return f"Address '{address}' is added to {self.name.value}'s record"
+            return Colorize.success(f"Address '{address}' is added to {self.name.value}'s record")
         except ValidationError as e:
-            return f"ERROR! {e}"
+            return Colorize.error(f"ERROR! {e}")
 
     # ============================
     #            STRING VIEW

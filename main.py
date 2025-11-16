@@ -37,6 +37,7 @@ from personal_assistant import (
     show_help,
 )
 from personal_assistant.command_use import command_list
+from personal_assistant.colorize import Colorize
 
 
 class AutoSuggestFromList(AutoSuggest):
@@ -77,7 +78,7 @@ def main():
     # завантаження даних контактів та нотаток
     book, notes = load_data()
 
-    print("Welcome to the assistant bot!")
+    print(Colorize.highlight("Welcome to the assistant bot!"))
     # показуємо головне меню тільки при запуску
     print_main_menu()
 
@@ -97,12 +98,12 @@ def main():
             match command:
 
                 case "close" | "exit":
-                    print("Good bye!")
+                    print((Colorize.highlight("Good bye!")))
                     save_data(book, notes)
                     break
 
                 case "hello":
-                    print("How can I help you?")
+                    print(Colorize.highlight("How can I help you?"))
 
                 case "help":
                     # виведення довідки по доступним командам
@@ -180,13 +181,13 @@ def main():
                     )
 
                     if matches:
-                        print(f"Invalid command. Did you mean '{matches[0]}'?")
+                        print(Colorize.warning(f"Invalid command. Did you mean '{matches[0]}'?"))
                     else:
-                        print("Invalid command. Type 'help' to see all commands.")
+                        print(Colorize.error("Invalid command. Type 'help' to see all commands."))
 
         except KeyboardInterrupt:
             # Коректний вихід через Ctrl+C
-            print("Good bye!")
+            print(Colorize.highlight("Good bye!"))
             save_data(book, notes)
             break
         except ValueError:
