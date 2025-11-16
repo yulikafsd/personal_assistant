@@ -5,6 +5,7 @@ from .addressbook import AddressBook
 from .record import Record
 from .notes import Notes
 from .colorize import Colorize
+from prettytable import PrettyTable
 
 
 # ============================
@@ -152,7 +153,17 @@ def show_contact(args, book: AddressBook):
 def show_all(book: AddressBook):
     if not book.data:
         return Colorize.error("No contacts were found.")
-    return "\n".join(str(record) for record in book.data.values())
+    # Виводимо всі контакти в табличному вигляді
+    table = PrettyTable()
+    table.field_names = ["Name", "Phone(s)", "Email(s)", "Birthday", "Address"]
+    table.align = "l"
+    for record in book.data.values():
+        phones = ", ".join(p.value for p in record.phones) if record.phones else "-"
+        emails = ", ".join(e.value for e in record.emails) if record.emails else "-"
+        birthday = str(record.birthday) if record.birthday else "-"
+        address = record.address.value if record.address else "-"
+        table.add_row([record.name.value, phones, emails, birthday, address])
+    return str(table)
 
 
 # ============================
