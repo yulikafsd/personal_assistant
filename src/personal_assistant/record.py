@@ -24,27 +24,63 @@ class Record:
     # ============================
 
     def add_phone(self, number: str):
-        """Adds new phone if it does not exist yet."""
-        if any(phone.value == number for phone in self.phones):
-            return f"{self.name.value}'s record already has the number: {number}"
+        """
+        Add new phone number to contact.
 
+        - Нормалізує номер через клас Phone (видаляє +, пробіли, дужки, тощо).
+        - Перевіряє, чи такий нормалізований номер вже є в записі.
+        """
         try:
-            self.phones.append(Phone(number))
-            return f"{self.name.value}'s record was updated with a new number: {number}"
+            phone_obj = Phone(number)  # тут відбувається валідація + нормалізація
         except ValidationError as e:
             return f"ERROR! No phone number was added! {e}"
 
-    def edit_phone(self, old_phone: str, new_phone: str):
-        """Updates existing phone number."""
-        for phone in self.phones:
-            if phone.value == old_phone:
-                try:
-                    phone.update(new_phone)
-                    return f"{self.name.value}'s record was updated with a new number: {new_phone}"
-                except ValidationError as e:
-                    return f"ERROR! No phone number was changed! {e}"
+        # Порівнюємо за нормалізованим значенням (phone_obj.value)
+        if any(p.value == phone_obj.value for p in self.phones):
+            return (
+                f"{self.name.value}'s record already has the number: "
+                f"{phone_obj.value}"
+            )
 
-        return f"User {self.name.value} has no phone {old_phone}."
+        self.phones.append(phone_obj)
+        return (
+            f"{self.name.value}'s record was updated with a new number: "
+            f"{phone_obj.value}"
+        )
+
+    def edit_phone(self, old_phone: str, new_phone: str):
+        """
+        Update existing phone number.
+
+        - old_phone: шукаємо по нормалізованому значенню (користувач може ввести в іншому форматі).
+        - new_phone: нормалізуємо та валідовуємо перед оновленням.
+        """
+        # Нормалізуємо старий номер, щоб знайти його в списку
+        try:
+            normalized_old = Phone(old_phone).value
+        except ValidationError:
+            # Якщо старий номер навіть не валідний — спробуємо шукати як є
+            normalized_old = old_phone
+
+        # Знаходимо потрібний Phone-об'єкт
+        target_phone = None
+        for phone in self.phones:
+            if phone.value == normalized_old or phone.value == old_phone:
+                target_phone = phone
+                break
+
+        if not target_phone:
+            return f"User {self.name.value} has no phone {old_phone}."
+
+        # Оновлюємо новим номером (всередині знову валідатор + нормалізація)
+        try:
+            target_phone.update(new_phone)
+            return (
+                f"{self.name.value}'s record was updated with a new number: "
+                f"{target_phone.value}"
+            )
+        except ValidationError as e:
+            return f"ERROR! No phone number was changed! {e}"
 
     # ============================
     #            EMAILS
@@ -69,7 +105,10 @@ class Record:
             if email_obj.value == old_email:
                 try:
                     email_obj.update(new_email)
-                    return f"{self.name.value}'s email was changed from {old_email} to {new_email}"
+                    return (
+                        f"{self.name.value}'s email was changed from "
+                        f"{old_email} to {new_email}"
+                    )
                 except ValidationError as e:
                     return f"ERROR! No email was changed! {e}"
 
@@ -81,7 +120,10 @@ class Record:
             if email_obj.value == email:
                 self.emails.remove(email_obj)
                 remaining = ", ".join(e.value for e in self.emails) if self.emails else "None"
-                return f"Email '{email}' was removed from {self.name.value}'s record.\nRemaining emails: {remaining}"
+                return (
+                    f"Email '{email}' was removed from {self.name.value}'s record.\n"
+                    f"Remaining emails: {remaining}"
+                )
 
         return f"{self.name.value} has no email '{email}'."
 
@@ -115,7 +157,25 @@ class Record:
     # ============================
 
     def matches_phone(self, phone: str) -> bool:
-        return any(p.value == phone for p in self.phones)
+        """
+        Compares phones using normalized value.
+
+        Користувач може шукати номер у будь-якому форматі:
+        - 0991234567
+        - 099-123-45-67
+        - +380991234567
+        - 380991234567
+
+        Ми нормалізуємо введене значення і порівнюємо з уже збереженими
+        нормалізованими номерами.
+        """
+        try:
+            normalized = Phone(phone).value
+        except ValidationError:
+            # Якщо пошуковий номер невалідний — вважаємо, що збігів немає
+            return False
+
+        return any(p.value == normalized for p in self.phones)
 
     def matches_email(self, email: str) -> bool:
         return any(e.value == email for e in self.emails)
