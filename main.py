@@ -36,35 +36,7 @@ from personal_assistant import (
     search_contacts,
     show_help,
 )
-
-# Список відомих команд для автодоповнення та "did you mean"
-command_list = [
-    "hello",
-    "exit",
-    "close",
-    "help",
-    "add",
-    "change",
-    "delete",
-    "phone",
-    "email",
-    "birthday",
-    "contact",
-    "all",
-    "add-address",
-    "add-email",
-    "change-email",
-    "delete-email",
-    "add-birthday",
-    "birthdays",
-    "search",
-    "add-note",
-    "find-note-by-title",
-    "delete-note",
-    "change-note",
-    "find-note-by-tag",
-    "all-notes",
-]
+from personal_assistant.command_use import command_list
 
 
 class AutoSuggestFromList(AutoSuggest):

@@ -17,7 +17,7 @@ class Notes:
     def __init__(self):
         self.notes = []
 
-    # HELPER METHOD (Private) Returns the note tags as a simple string
+    # Допоміжний метод (Приватний) для отримання тексту тегів нотатки
     def _get_tags_text(self, note) -> str:
         if hasattr(note, 'tags'):
             t = note.tags
@@ -69,8 +69,8 @@ class Notes:
             actual_tags = [t.strip() for t in tags_text.split(',')]
             if tag in actual_tags:
                 matched_notes.append(note)
-
-        matched_notes.sort(key=lambda x: self._get_tags_text(x).lower())  
+        # Сортуємо нотатки за заголовком у алфавітному порядку
+        matched_notes.sort(key=lambda x: str(x.title).lower())  
         return matched_notes
     
     def show_all_notes(self) -> str:

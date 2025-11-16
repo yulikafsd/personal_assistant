@@ -39,3 +39,33 @@ class Command_Use(Enum):
     CHANGE_NOTE = "change-note"
     FIND_NOTE_BY_TAG = "find-note-by-tag"
     ALL_NOTES = "all-notes"
+
+
+# Список відомих команд для автодоповнення та "did you mean"
+command_list = [
+    "hello",
+    "exit",
+    "close",
+    "help",
+    "add",
+    "change",
+    "delete",
+    "phone",
+    "email",
+    "birthday",
+    "contact",
+    "all",
+    "add-address",
+    "add-email",
+    "change-email",
+    "delete-email",
+    "add-birthday",
+    "birthdays",
+    "search",
+    "add-note",
+    "find-note-by-title",
+    "delete-note",
+    "change-note",
+    "find-note-by-tag",
+    "all-notes",
+]
