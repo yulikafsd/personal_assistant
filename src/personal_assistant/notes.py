@@ -1,4 +1,5 @@
 from .fields import Title, Content, Tags
+from .colorize import Colorize
 
 class Note:
     def __init__(self, title, content=None, tags=None):
@@ -28,14 +29,14 @@ class Notes:
 
     def add_note(self, title, text=None, tags=None) -> str:
         if self.find_note_by_title(title):
-            raise ValueError(f"Note with title '{title}' already exists")
+            raise ValueError(Colorize.error(f"Note with title '{title}' already exists"))
         note = Note(title, text, tags)
         self.notes.append(note)
-        return f"Note with title '{title}' added successfully."
+        return Colorize.success(f"Note with title '{title}' added successfully.")
     
     def find_note_by_title(self, title):
         if not title:
-            raise ValueError("Title is required")
+            raise ValueError(Colorize.warning("Title is required"))
         for note in self.notes:
             if note.title.value == title:
                 return note
@@ -45,22 +46,22 @@ class Notes:
         note = self.find_note_by_title(title)
         if note:
             self.notes.remove(note)
-            return f"Note with title '{title}' deleted successfully."
+            return Colorize.success(f"Note with title '{title}' deleted successfully.")
         else:
-            return f"Note with title '{title}' not found"
+            return Colorize.error(f"Note with title '{title}' not found")
         
     def change_note(self, title, new_content, new_tags) -> str:
         note = self.find_note_by_title(title)
         if note:
             note.content = Content(new_content) if new_content else note.content
             note.tags = Tags(new_tags) if new_tags else note.tags
-            return f"Note with title '{title}' updated successfully."
+            return Colorize.success(f"Note with title '{title}' updated successfully.")
         else:
-            return f"Note with title '{title}' not found"
+            return Colorize.error(f"Note with title '{title}' not found")
         
     def find_note_by_tag(self, tag: str) -> list:
         if not tag:
-            raise ValueError("Tag is required")
+            raise ValueError(Colorize.warning("Tag is required"))
         matched_notes = []
         tag = tag.strip().lower()
         for note in self.notes:
@@ -75,7 +76,7 @@ class Notes:
     
     def show_all_notes(self) -> str:
         if not self.notes:
-            return "No notes available."
+            return Colorize.error("No notes available.")
         divider = "-" * 40
         notes_str = "\n".join(f"{divider}\n{str(note)}\n{divider}" for note in self.notes)
         return notes_str

@@ -5,6 +5,7 @@ from .notes import Note, Notes
 from .fields import Name, Phone, Birthday, Address, Email, Title, Content, Tags
 from .errors import ValidationError
 from .command_use import Command_Use
+from .colorize import Colorize
 from .utils import input_error
 from .pickle_data import load_data, save_data
 from .input_parser import parse_input
@@ -51,6 +52,7 @@ __all__ = [
     "Notes",
     "ValidationError",
     "Command_Use",
+    "Colorize",
     "input_error",
     "load_data",
     "save_data",

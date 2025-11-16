@@ -4,6 +4,7 @@ from .utils import input_error
 from .addressbook import AddressBook
 from .record import Record
 from .notes import Notes
+from .colorize import Colorize
 
 
 # ============================
@@ -20,10 +21,10 @@ def add_contact(args, book: AddressBook):
         book.add_record(record)
     else:
         user_input = input(
-            f"Contact {name_capitalized} already exists.\nAdd another phone number to the contact? Y/N: "
+            Colorize.warning(f"Contact {name_capitalized} already exists.\nAdd another phone number to the contact? Y/N: ")
         )
         if user_input.lower() == "n":
-            return "Nothing changed"
+            return Colorize.info("Nothing changed")
 
     return record.add_phone(phone)
 
@@ -36,12 +37,12 @@ def change_contact(args, book: AddressBook):
 
     if not record:
         user_input = input(
-            f"Contact with name {name_capitalized} was not found.\nAdd a new contact? Y/N: "
+            (Colorize.warning(f"Contact with name {name_capitalized} was not found.\nAdd a new contact? Y/N: "))
         )
         if user_input.lower() == "y":
             return add_contact([name_capitalized, new_phone], book)
         else:
-            return "Nothing changed"
+            return Colorize.info("Nothing changed")
 
     return record.edit_phone(old_phone, new_phone)
 
@@ -53,9 +54,9 @@ def delete_contact(args, book: AddressBook):
     name = args[0].capitalize()
     record = book.find(name)
     if not record:
-        return f"Contact with name {name} was not found."
+        return Colorize.info(f"Contact with name {name} was not found.")
     book.delete(name)
-    return f"Contact {name} was deleted successfully."
+    return Colorize.success(f"Contact {name} was deleted successfully.")
 
 
 # ----------------------- Хелпери для відображення -----------------------
@@ -69,7 +70,7 @@ def _show_generic(
     value = getattr(record, field_name)
 
     if not value:
-        return f"{record.name.value} has no {plural_name or field_name} yet."
+        return Colorize.error(f"{record.name.value} has no {plural_name or field_name} yet.")
 
     if isinstance(value, list):
         return (
@@ -85,7 +86,7 @@ def _show_field(args, book, show_func):
     name = args[0].capitalize()
     record = book.find(name)
     if not record:
-        return f"Contact with name {name} was not found."
+        return Colorize.error(f"Contact with name {name} was not found.")
     return show_func(record)
 
 
@@ -125,7 +126,7 @@ def show_contact(args, book: AddressBook):
     name = args[0].capitalize()
     record = book.find(name)
     if not record:
-        return f"Contact with name {name} was not found."
+        return Colorize.error(f"Contact with name {name} was not found.")
 
     fields = [
         ("Phones", lambda r: _show_generic(r, "phones", lambda p: p.value, "phone(s)")),
@@ -142,7 +143,7 @@ def show_contact(args, book: AddressBook):
             results.append(info)
 
     if not results:
-        return f"{record.name.value} has no info yet."
+        return Colorize.error(f"{record.name.value} has no info yet.")
 
     return "---\n" + "\n".join(results) + "\n---"
 
@@ -150,7 +151,7 @@ def show_contact(args, book: AddressBook):
 @input_error
 def show_all(book: AddressBook):
     if not book.data:
-        return "No contacts were found."
+        return Colorize.error("No contacts were found.")
     return "\n".join(str(record) for record in book.data.values())
 
 
@@ -165,14 +166,14 @@ def add_address(args, book: AddressBook) -> str:
     Виклик: add-address <name> <address...>
     """
     if len(args) < 2:
-        return "You must provide name and address."
+        return Colorize.warning("You must provide name and address.")
 
     name, *address_parts = args
     name_capitalized = name.capitalize()
     record = book.find(name_capitalized)
 
     if not record:
-        return f"Contact with name {name_capitalized} was not found."
+        return Colorize.error(f"Contact with name {name_capitalized} was not found.")
 
     address = " ".join(address_parts)
     return record.add_address(address)
@@ -189,13 +190,13 @@ def add_email(args, book: AddressBook):
 
     if not record:
         user_input = input(
-            f"Contact with name {name_capitalized} was not found.\nAdd a new contact? Y/N: "
+            Colorize.warning(f"Contact with name {name_capitalized} was not found.\nAdd a new contact? Y/N: ")
         )
         if user_input.lower() == "y":
             record = Record(name_capitalized)
             book.add_record(record)
         else:
-            return "Nothing changed"
+            return Colorize.info("Nothing changed")
 
     return record.add_email(email)
 
@@ -208,15 +209,15 @@ def change_email(args, book: AddressBook):
 
     if not record:
         user_input = input(
-            f"Contact with name {name_capitalized} was not found.\nAdd a new contact? Y/N: "
+            Colorize.warning(f"Contact with name {name_capitalized} was not found.\nAdd a new contact? Y/N: ")
         )
         if user_input.lower() == "y":
             record = Record(name_capitalized)
             record.add_email(new_email)
             book.add_record(record)
-            return f"Contact {name_capitalized} created with email {new_email}"
+            return Colorize.success(f"Contact {name_capitalized} created with email {new_email}")
         else:
-            return "Nothing changed"
+            return Colorize.info("Nothing changed")
 
     return record.edit_email(old_email, new_email)
 
@@ -228,7 +229,7 @@ def delete_email(args, book: AddressBook):
 
     record = book.find(name_capitalized)
     if not record:
-        return f"Contact {name_capitalized} was not found."
+        return Colorize.error(f"Contact {name_capitalized} was not found.")
 
     result = record.remove_email(email)
     return result
@@ -243,19 +244,19 @@ def add_birthday(args, book: AddressBook):
     name_capitalized = name.capitalize()
     record = book.find(name_capitalized)
     if not record:
-        return f"Contact with name {name_capitalized} was not found."
+        return Colorize.error(f"Contact with name {name_capitalized} was not found.")
     return record.add_birthday(new_birthday)
 
 
 @input_error
 def birthdays(args, book: AddressBook):
     if not book.data:
-        return "No contacts were found."
+        return Colorize.error("No contacts were found.")
 
     days_from_today = 7 if not args else int(args[0])
     upcoming_bds = book.get_upcoming_birthdays(days_from_today)
     if not upcoming_bds:
-        return f"No birthdays in the next {days_from_today} days."
+        return Colorize.error(f"No birthdays in the next {days_from_today} days.")
     return ", ".join(
         f"{user['name']}: {user['congratulation_date']}" for user in upcoming_bds
     )
@@ -272,7 +273,7 @@ def search_contacts(args, book: AddressBook) -> str:
     birthday: у форматі DD.MM.YYYY
     """
     if len(args) < 2:
-        return "Вкажіть поле та значення для пошуку. Наприклад: search phone 1234567890"
+        return Colorize.warning("Вкажіть поле та значення для пошуку. Наприклад: search phone 1234567890")
 
     field, value, *_ = args
     field = field.lower().strip()
@@ -308,10 +309,10 @@ def search_contacts(args, book: AddressBook) -> str:
                 if bday_str == value:
                     found_records.append(str(record))
         else:
-            return "Невідоме поле для пошуку. Доступні: phone, email, birthday."
+            return Colorize.error("Невідоме поле для пошуку. Доступні: phone, email, birthday.")
 
     if not found_records:
-        return "Контакти за заданими критеріями не знайдені."
+        return Colorize.error("Контакти за заданими критеріями не знайдені.")
 
     return "Знайдені контакти:\n" + "\n".join(found_records)
 
@@ -321,38 +322,38 @@ def search_contacts(args, book: AddressBook) -> str:
 # ============================
 @input_error
 def add_note(notes: Notes) -> str:
-    title = input("Enter note title: ")
-    text = input("Enter note text: ")
-    tags = input("Enter note tags (comma separated): ")
+    title = input(Colorize.highlight("Enter note title: "))
+    text = input(Colorize.highlight("Enter note text: "))
+    tags = input(Colorize.highlight("Enter note tags (comma separated): "))
     try:
         notes.add_note(title, text, tags)
-        return f"Note with title '{title}' added successfully."
+        return Colorize.success(f"Note with title '{title}' added successfully.")
     except ValueError as e:
-        return str(e)
+        return Colorize.error(str(e))
 
 
 @input_error
 def find_note_by_title(notes: Notes) -> str:
-    title = input("Enter note title to find: ")
+    title = input(Colorize.highlight("Enter note title to find: "))
     note = notes.find_note_by_title(title)
     if note:
         return str(note)
     else:
-        return f"Note with title '{title}' not found."
+        return Colorize.error(f"Note with title '{title}' not found.")
 
 
 @input_error
 def delete_note(notes: Notes) -> str:
-    title = input("Enter note title to delete: ")
+    title = input(Colorize.highlight("Enter note title to delete: "))
     result = notes.delete_note(title)
     return result
 
 
 @input_error
 def change_note(notes: Notes) -> str:
-    title = input("Enter note title to edit: ")
-    new_content = input("Enter new content: ")
-    new_tags = input("Enter new tags (comma separated): ")
+    title = input(Colorize.highlight("Enter note title to edit: "))
+    new_content = input(Colorize.highlight("Enter new content: "))
+    new_tags = input(Colorize.highlight("Enter new tags (comma separated): "))
     result = notes.change_note(
         title, new_content if new_content else None, new_tags if new_tags else None
     )
@@ -361,13 +362,13 @@ def change_note(notes: Notes) -> str:
 
 @input_error
 def find_note_by_tag(notes: Notes) -> str:
-    tag = input("Enter tag to find note: ")
+    tag = input(Colorize.highlight("Enter tag to find note: "))
     matched_notes = notes.find_note_by_tag(tag)
     divider = "-"*40
     if matched_notes:
         return "\n".join(f"{divider}\n{str(note)}\n{divider}" for note in matched_notes)
     else:
-        return f"No notes found with tag '{tag}'."
+        return Colorize.error(f"No notes found with tag '{tag}'.")
 
 
 @input_error

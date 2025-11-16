@@ -3,12 +3,13 @@ from datetime import datetime, date
 
 from .record import Record
 from .errors import ValidationError
+from .colorize import Colorize
 
 
 class AddressBook(UserDict):
     def add_record(self, record: Record):
         self.data[record.name.value] = record
-        return f"New record for {record.name.value} was added to the book:\n{self.data}"
+        return Colorize.success(f"New record for {record.name.value} was added to the book:\n{self.data}")
 
     def find(self, name: str) -> Record | None:
         record = self.data.get(name)
@@ -17,9 +18,9 @@ class AddressBook(UserDict):
     def delete(self, name: str) -> str:
         record = self.data.get(name)
         if not record:
-            return f"No contact {name} was found"
+            return Colorize.error(f"No contact {name} was found")
         del self.data[name]
-        return f"{name} deleted from contacts"
+        return Colorize.success(f"{name} deleted from contacts")
 
     def get_upcoming_birthdays(self, days_from_today: int) -> list[dict]:
         """
