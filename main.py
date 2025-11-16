@@ -9,7 +9,6 @@ sys.path.append("src")
 # pip install -e src/
 
 from personal_assistant import (
-    Command_Use,
     load_data,
     save_data,
     parse_input,
@@ -36,34 +35,8 @@ from personal_assistant import (
     search_contacts,
     show_help,
 )
+from personal_assistant.command_use import command_list
 
-command_list = [
-    "hello",
-    "exit",
-    "close",
-    "help",
-    "add",
-    "change",
-    "delete",
-    "phone",
-    "email",
-    "birthday",
-    "contact",
-    "all",
-    "add-address",
-    "add-email",
-    "change-email",
-    "delete-email",
-    "add-birthday",
-    "birthdays",
-    "search",
-    "add-note",
-    "find-note-by-title",
-    "delete-note",
-    "change-note",
-    "find-note-by-tag",
-    "all-notes",
-]
 
 class AutoSuggestFromList(AutoSuggest):
     def __init__(self, options):
