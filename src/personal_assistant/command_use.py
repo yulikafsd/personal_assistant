@@ -43,7 +43,7 @@ class Command_Use(Enum):
     ALL_NOTES = "all-notes"
 
 
-# Commands list for autosuggest and "Die you mean..?"
+# Commands list for autosuggest and "Did you mean..?"
 command_list = [
     "hello",
     "exit",
