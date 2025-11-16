@@ -38,6 +38,7 @@ class Field:
 #       SPECIFIC FIELDS
 # ===============================
 
+
 class Name(Field):
     """Name uses only base validation."""
     pass
@@ -45,25 +46,36 @@ class Name(Field):
 
 class Phone(Field):
     """
-    Phone now supports normalization:
-    - Removes spaces, parentheses, dashes, '+'
-    - Validates 10 digits
+    Phone with normalization for Ukrainian numbers.
+
+    - Видаляє всі символи, крім цифр (пробіли, дужки, тире, '+').
+    - Приймає:
+        * 10 цифр і починається з '0'     -> приводиться до формату 380XXXXXXXXX
+        * 12 цифр і починається з '380'   -> вважається вже нормалізованим
+    - Зберігає значення тільки у форматі '380XXXXXXXXX'.
     """
 
-    NORMALIZE_PATTERN = re.compile(r"[^\d]")  # everything except digits
+    NON_DIGITS_PATTERN = re.compile(r"\D+")
 
     def validate(self, value):
         raw = self.base_validate(value)
 
-        # Remove all non-digit characters (normalization)
-        number = re.sub(self.NORMALIZE_PATTERN, "", raw)
+        # 1) нормалізація: залишаємо тільки цифри
+        digits = re.sub(self.NON_DIGITS_PATTERN, "", raw)
 
-        if len(number) != 10:
-            raise ValidationError(
-                "Phone must contain exactly 10 digits after normalization"
-            )
+        # 2) якщо вже у форматі 380XXXXXXXXX
+        if digits.startswith("380") and len(digits) == 12:
+            return digits
 
-        return number
+        # 3) місцевий формат 0XXXXXXXXX -> приводимо до 380XXXXXXXXX
+        if digits.startswith("0") and len(digits) == 10:
+            return "38" + digits  # 0XXXXXXXXX -> 380XXXXXXXXX
+
+        # 4) усе інше вважається неукраїнським номером
+        raise ValidationError(
+            "Phone must be a Ukrainian number: 10 digits starting with 0 "
+            "or 12 digits starting with 380"
+        )
 
 
 class Birthday(Field):
@@ -106,7 +118,7 @@ class Address(Field):
     Minimal address validation:
     - Not empty
     - Minimal length: 5
-    - Allowed characters: letters, digits, comma, dot, dash, space
+    - Allowed characters: letters, digits, comma, dot, dash, slash, space
     """
 
     ALLOWED_PATTERN = re.compile(r"^[A-Za-z0-9а-яА-ЯёЁіІїЇєЄ ,.\-\/]+$")
