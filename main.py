@@ -9,6 +9,7 @@ sys.path.append("src")
 # pip install -e src/
 
 from personal_assistant import (
+    Command_Use,
     load_data,
     save_data,
     parse_input,
@@ -39,23 +40,37 @@ from personal_assistant.command_use import command_list
 
 
 class AutoSuggestFromList(AutoSuggest):
+    """Автодоповнення команд з фіксованого списку."""
+
     def __init__(self, options):
         self.options = sorted(options)
 
     def get_suggestion(self, buffer, document):
         text = document.text_before_cursor.strip()
-        
-        # Якщо текст порожній - нічого не підказуємо
+
+        # Порожній ввід — без підказок
         if not text:
             return None
 
-        # Шукаємо першу команду, яка починається з введеного тексту
+        # Пошук першої команди, що починається з введеного тексту
         for option in self.options:
             if option.startswith(text.lower()):
-                # Повертаємо ту частину команди, яку користувач ще не ввів
                 return Suggestion(option[len(text):])
 
         return None
+
+
+def print_main_menu() -> None:
+    """
+    Виводить головне меню з доступними командами.
+    Використовує Enum Command_Use, щоб всі команди зберігались в одному місці.
+    Показується лише один раз — при старті програми.
+    """
+    print("\n=== MAIN MENU ===")
+    print("Available commands:")
+    for cmd in Command_Use:
+        print(f" - {cmd.value}")
+    print("=================\n")
 
 
 def main():
@@ -63,7 +78,10 @@ def main():
     book, notes = load_data()
 
     print("Welcome to the assistant bot!")
+    # показуємо головне меню тільки при запуску
+    print_main_menu()
 
+    # сесія вводу з автодоповненням команд
     session = PromptSession(auto_suggest=AutoSuggestFromList(command_list))
 
     while True:
@@ -124,7 +142,8 @@ def main():
                     print(change_email(args, book))
 
                 case "delete-email":
-                    (delete_email(args, book))
+                    # тут раніше не було print — тепер результат бачимо в консолі
+                    print(delete_email(args, book))
 
                 case "add-birthday":
                     print(add_birthday(args, book))
@@ -156,20 +175,24 @@ def main():
 
                 case _:
                     # Шукаємо найбільш схожу команду
-                    matches = difflib.get_close_matches(command, command_list, n=1, cutoff=0.6)
-                    
+                    matches = difflib.get_close_matches(
+                        command, command_list, n=1, cutoff=0.6
+                    )
+
                     if matches:
                         print(f"Invalid command. Did you mean '{matches[0]}'?")
                     else:
                         print("Invalid command. Type 'help' to see all commands.")
 
         except KeyboardInterrupt:
-            # Дозволяє коректно вийти через Ctrl+C
+            # Коректний вихід через Ctrl+C
             print("Good bye!")
             save_data(book, notes)
             break
         except ValueError:
+            # parse_input повернув щось некоректне — просто пропускаємо і чекаємо наступний ввід
             continue
+
 
 if __name__ == "__main__":
     main()

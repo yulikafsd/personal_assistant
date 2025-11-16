@@ -41,6 +41,7 @@ class Command_Use(Enum):
     ALL_NOTES = "all-notes"
 
 
+# Список відомих команд для автодоповнення та "did you mean"
 command_list = [
     "hello",
     "exit",
