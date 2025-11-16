@@ -3,6 +3,7 @@
 # # перед здачею проєкту видалити 1–3 рядки та встановити пакет локально:
 # # pip install -e src/import difflib
 
+import difflib
 from prompt_toolkit import PromptSession
 from prompt_toolkit.auto_suggest import AutoSuggest, Suggestion
 
