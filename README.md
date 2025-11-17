@@ -144,16 +144,16 @@ reinstall the package locally (pip install -e .).
 ## ⌨️ Quick Usage Examples
 
 #### Add a contact
-`assistant> add John 380991234567`
+`pn-assistant> add John 380991234567`
 
 #### Add an email
-`assistant> add-email John john@gmail.com`
+`pn-assistant> add-email John john@gmail.com`
 
 #### Check birthday
-`assistant> birthday John`
+`pn-assistant> birthday John`
 
 #### View all contacts
-`assistant> all`
+`pn-assistant> all`
 
 ## 💠 System Requirements
 - Python ≥ 3.9
