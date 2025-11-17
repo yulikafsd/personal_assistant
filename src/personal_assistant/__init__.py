@@ -1,4 +1,4 @@
-# Основні імпорти модулів
+# Basic module imports
 from .addressbook import AddressBook
 from .record import Record
 from .notes import Note, Notes
@@ -10,7 +10,7 @@ from .utils import input_error
 from .pickle_data import load_data, save_data
 from .input_parser import parse_input
 
-# Команди застосунку
+# Application commands
 from .commands import (
     add_contact,
     change_contact,
@@ -36,7 +36,7 @@ from .commands import (
     show_help,
 )
 
-# Експортовані імена пакета
+# Exported package names
 __all__ = [
     "AddressBook",
     "Record",

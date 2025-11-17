@@ -31,6 +31,7 @@ class Field:
         self.value = self.validate(new_value)
 
     def __str__(self) -> str:
+        """String representation of the field."""
         return str(self.value)
 
 
@@ -41,6 +42,7 @@ class Field:
 
 class Name(Field):
     """Name uses only base validation."""
+
     pass
 
 
@@ -48,30 +50,31 @@ class Phone(Field):
     """
     Phone with normalization for Ukrainian numbers.
 
-    - Видаляє всі символи, крім цифр (пробіли, дужки, тире, '+').
-    - Приймає:
-        * 10 цифр і починається з '0'     -> приводиться до формату 380XXXXXXXXX
-        * 12 цифр і починається з '380'   -> вважається вже нормалізованим
-    - Зберігає значення тільки у форматі '380XXXXXXXXX'.
+    - Removes all characters except digits (spaces, parentheses, dashes, '+').
+    - Accepts:
+        * 10 digits starting with '0'     -> converted to format 380XXXXXXXXX
+        * 12 digits starting with '380'   -> considered already normalized
+    - Stores values ​​only in the format '380XXXXXXXXX'.
     """
 
     NON_DIGITS_PATTERN = re.compile(r"\D+")
 
     def validate(self, value):
+        """Validates and normalizes Ukrainian phone numbers."""
         raw = self.base_validate(value)
 
-        # 1) нормалізація: залишаємо тільки цифри
+        # 1) normalize: remove all non-digit characters
         digits = re.sub(self.NON_DIGITS_PATTERN, "", raw)
 
-        # 2) якщо вже у форматі 380XXXXXXXXX
+        # 2) if already in the format 380XXXXXXXXX
         if digits.startswith("380") and len(digits) == 12:
             return digits
 
-        # 3) місцевий формат 0XXXXXXXXX -> приводимо до 380XXXXXXXXX
+        # 3) local format 0XXXXXXXXX -> convert to 380XXXXXXXXX
         if digits.startswith("0") and len(digits) == 10:
             return "38" + digits  # 0XXXXXXXXX -> 380XXXXXXXXX
 
-        # 4) усе інше вважається неукраїнським номером
+        # 4) everything else is considered a non-Ukrainian number
         raise ValidationError(
             "Phone must be a Ukrainian number: 10 digits starting with 0 "
             "or 12 digits starting with 380"
@@ -84,6 +87,7 @@ class Birthday(Field):
     DATE_PATTERN = re.compile(r"\d{2}\.\d{2}\.\d{4}$")
 
     def validate(self, value):
+        """Validates birthday format and converts to datetime."""
         if not isinstance(value, str):
             raise ValidationError("Birthday must be a string")
 
@@ -107,6 +111,7 @@ class Email(Field):
     EMAIL_PATTERN = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
 
     def validate(self, value):
+        """Validates email format."""
         email = self.base_validate(value)
         if not self.EMAIL_PATTERN.match(email):
             raise ValidationError(f"Invalid email format: {email}")
@@ -124,6 +129,7 @@ class Address(Field):
     ALLOWED_PATTERN = re.compile(r"^[A-Za-z0-9а-яА-ЯёЁіІїЇєЄ ,.\-\/]+$")
 
     def validate(self, value):
+        """Validates address format and length."""
         address = self.base_validate(value)
 
         if len(address) < 5:
@@ -137,17 +143,23 @@ class Address(Field):
 
 class Title(Field):
     """Title must be a non-empty string."""
+    
     def validate(self, value):
+        """Validates title as non-empty string."""
         return self.base_validate(value)
 
 
 class Content(Field):
     """Content may be empty."""
+    
     def validate(self, value):
+        """Validates content (may be empty)."""
         return value
 
 
 class Tags(Field):
     """Tags are comma-separated text, non-empty."""
+    
     def validate(self, value):
+        """Validates tags as comma-separated text, non-empty."""
         return self.base_validate(value)
