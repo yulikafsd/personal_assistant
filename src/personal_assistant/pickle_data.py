@@ -3,19 +3,19 @@ import pickle
 from .addressbook import AddressBook
 from .notes import Notes
 
-DEFAULT_DIR = os.path.join(os.path.expanduser("~"), ".assistant")
+DEFAULT_DIR = os.path.join(os.path.expanduser("~"), ".pn-assistant")
 DEFAULT_FILE = os.path.join(DEFAULT_DIR, "addressbook.pkl")
 
 
 def ensure_data_dir():
-    """Creates directory ~/.assistant if it doesn't exist."""
+    """Creates directory ~/.pn-assistant if it doesn't exist."""
 
     if not os.path.exists(DEFAULT_DIR):
         os.makedirs(DEFAULT_DIR)
 
 
 def load_data(filepath=DEFAULT_FILE):
-    """Loads data from ~/.assistant/addressbook.pkl or creates new."""
+    """Loads data from ~/.pn-assistant/addressbook.pkl or creates new."""
 
     ensure_data_dir()
 
@@ -28,7 +28,7 @@ def load_data(filepath=DEFAULT_FILE):
 
 
 def save_data(addressbook, notes, filepath=DEFAULT_FILE):
-    """Saves data to ~/.assistant/addressbook.pkl."""
+    """Saves data to ~/.pn-assistant/addressbook.pkl."""
     
     ensure_data_dir()
 
