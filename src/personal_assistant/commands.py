@@ -9,10 +9,11 @@ from prettytable import PrettyTable
 
 
 # ============================
-# 📇 Контакти
+# 📇 Contacts
 # ============================
 @input_error
 def add_contact(args, book: AddressBook):
+    """Add a new contact or a new phone number to an existing contact."""
     name, phone, *_ = args
     name_capitalized = name.capitalize()
     record = book.find(name_capitalized)
@@ -32,6 +33,7 @@ def add_contact(args, book: AddressBook):
 
 @input_error
 def change_contact(args, book: AddressBook):
+    """Change an existing phone number of a contact."""
     name, old_phone, new_phone, *_ = args
     name_capitalized = name.capitalize()
     record = book.find(name_capitalized)
@@ -50,6 +52,7 @@ def change_contact(args, book: AddressBook):
 
 @input_error
 def delete_contact(args, book: AddressBook):
+    """Deletes a contact by its name."""
     if not args:
         raise IndexError
     name = args[0].capitalize()
@@ -60,14 +63,14 @@ def delete_contact(args, book: AddressBook):
     return Colorize.success(f"Contact {name} was deleted successfully.")
 
 
-# ----------------------- Хелпери для відображення -----------------------
+# ----------------------- Helpers for display -----------------------
 def _show_generic(
     record: Any,
     field_name: str,
     display_func: Callable[[Any], str] = str,
     plural_name: str | None = None,
 ) -> str:
-    """Універсальний хелпер для show_* полів."""
+    """Universal helper for show_* fields."""
     value = getattr(record, field_name)
 
     if not value:
@@ -83,7 +86,7 @@ def _show_generic(
 
 
 def _show_field(args, book, show_func):
-    """Універсальна обгортка для show_* команд."""
+    """Universal wrapper for show_* commands."""
     name = args[0].capitalize()
     record = book.find(name)
     if not record:
@@ -91,9 +94,10 @@ def _show_field(args, book, show_func):
     return show_func(record)
 
 
-# ----------------------- Show команди -----------------------
+# ----------------------- Show commands -----------------------
 @input_error
 def show_phone(args, book: AddressBook):
+    """Shows phone numbers of a contact."""
     return _show_field(
         args, book, lambda r: _show_generic(r, "phones", lambda p: p.value, "phone(s)")
     )
@@ -101,6 +105,7 @@ def show_phone(args, book: AddressBook):
 
 @input_error
 def show_email(args, book: AddressBook):
+    """Shows email addresses of a contact."""
     return _show_field(
         args, book, lambda r: _show_generic(r, "emails", lambda e: e.value, "email(s)")
     )
@@ -108,6 +113,7 @@ def show_email(args, book: AddressBook):
 
 @input_error
 def show_birthday(args, book: AddressBook):
+    """Shows birthday of a contact."""
     return _show_field(
         args, book, lambda r: _show_generic(r, "birthday", lambda b: str(b))
     )
@@ -115,15 +121,16 @@ def show_birthday(args, book: AddressBook):
 
 @input_error
 def show_address(args, book: AddressBook):
+    """Shows address of a contact."""
     return _show_field(
         args, book, lambda r: _show_generic(r, "address", lambda a: a.value)
     )
 
 
-# ----------------------- Show contact (усі поля разом) -----------------------
+# ----------------------- Show contact (all fields together) -----------------------
 @input_error
 def show_contact(args, book: AddressBook):
-    """Показує всі дані контакта в одному рядку, пропускаючи порожні поля."""
+    """Shows all contact data in one line, skipping empty fields."""
     name = args[0].capitalize()
     record = book.find(name)
     if not record:
@@ -139,7 +146,7 @@ def show_contact(args, book: AddressBook):
     results = []
     for _, func in fields:
         info = func(record)
-        # Пропускаємо поля, що повертають 'has no ...'
+        # Skip fields that return 'has no ...'
         if "has no" not in info:
             results.append(info)
 
@@ -151,9 +158,10 @@ def show_contact(args, book: AddressBook):
 
 @input_error
 def show_all(book: AddressBook):
+    """Shows all contacts in the address book."""
     if not book.data:
         return Colorize.error("No contacts were found.")
-    # Виводимо всі контакти в табличному вигляді
+    # Display all contacts in a table format
     table = PrettyTable()
     table.field_names = ["Name", "Phone(s)", "Email(s)", "Birthday", "Address"]
     table.align = "l"
@@ -172,9 +180,9 @@ def show_all(book: AddressBook):
 @input_error
 def add_address(args, book: AddressBook) -> str:
     """
-    Додати/оновити адресу контакта.
+    Add/update a contact address.
 
-    Виклик: add-address <name> <address...>
+    Usage: add-address <name> <address...>
     """
     if len(args) < 2:
         return Colorize.warning("You must provide name and address.")
@@ -191,10 +199,11 @@ def add_address(args, book: AddressBook) -> str:
 
 
 # ============================
-# ✉ Email-и
+# ✉ Email-s
 # ============================
 @input_error
 def add_email(args, book: AddressBook):
+    """Add a new email to a contact."""
     name, email, *_ = args
     name_capitalized = name.capitalize()
     record = book.find(name_capitalized)
@@ -214,6 +223,7 @@ def add_email(args, book: AddressBook):
 
 @input_error
 def change_email(args, book: AddressBook):
+    """Change an existing email of a contact."""
     name, old_email, new_email, *_ = args
     name_capitalized = name.capitalize()
     record = book.find(name_capitalized)
@@ -235,6 +245,7 @@ def change_email(args, book: AddressBook):
 
 @input_error
 def delete_email(args, book: AddressBook):
+    """Delete an email from a contact."""
     name, email, *_ = args
     name_capitalized = name.capitalize()
 
@@ -247,10 +258,11 @@ def delete_email(args, book: AddressBook):
 
 
 # ============================
-# 🎂 Дні народження
+# 🎂 Birthdays
 # ============================
 @input_error
 def add_birthday(args, book: AddressBook):
+    """Add a birthday to a contact."""
     name, new_birthday, *_ = args
     name_capitalized = name.capitalize()
     record = book.find(name_capitalized)
@@ -261,6 +273,7 @@ def add_birthday(args, book: AddressBook):
 
 @input_error
 def birthdays(args, book: AddressBook):
+    """Shows upcoming birthdays within a specified number of days (default is 7)."""
     if not book.data:
         return Colorize.error("No contacts were found.")
 
@@ -274,17 +287,17 @@ def birthdays(args, book: AddressBook):
 
 
 # ============================
-# 🔍 Пошук контактів (phone/email/birthday)
+# 🔍 Search for contacts (phone/email/birthday)
 # ============================
 @input_error
 def search_contacts(args, book: AddressBook) -> str:
     """
     search <field> <value>
     field: phone / email / birthday
-    birthday: у форматі DD.MM.YYYY
+    birthday: in the format DD.MM.YYYY
     """
     if len(args) < 2:
-        return Colorize.warning("Вкажіть поле та значення для пошуку. Наприклад: search phone 1234567890")
+        return Colorize.warning("Specify the field and value for search. For example: search phone 1234567890")
 
     field, value, *_ = args
     field = field.lower().strip()
@@ -293,14 +306,14 @@ def search_contacts(args, book: AddressBook) -> str:
     found_records = []
 
     for record in book.data.values():
-        # Пошук за телефоном
+        # Search by phone
         if field in ("phone", "tel"):
             for phone in record.phones:
                 if phone.value == value:
                     found_records.append(str(record))
                     break
 
-        # Пошук за email
+        # Search by email
         elif field in ("email", "mail"):
             email_obj = getattr(record, "emails", None)
             if email_obj:
@@ -309,7 +322,7 @@ def search_contacts(args, book: AddressBook) -> str:
                         found_records.append(str(record))
                         break
 
-        # Пошук за днем народження (формат DD.MM.YYYY)
+        # Search by birthday (format DD.MM.YYYY)
         elif field in ("birthday", "bday", "bd"):
             if record.birthday:
                 bday_obj = getattr(record.birthday, "value", record.birthday)
@@ -320,19 +333,20 @@ def search_contacts(args, book: AddressBook) -> str:
                 if bday_str == value:
                     found_records.append(str(record))
         else:
-            return Colorize.error("Невідоме поле для пошуку. Доступні: phone, email, birthday.")
+            return Colorize.error("Unknown search field. Available: phone, email, birthday.")
 
     if not found_records:
-        return Colorize.error("Контакти за заданими критеріями не знайдені.")
+        return Colorize.error("No contacts found matching the criteria.")
 
-    return "Знайдені контакти:\n" + "\n".join(found_records)
+    return "Found contacts:\n" + "\n".join(found_records)
 
 
 # ============================
-# 📝 Нотатки
+# 📝 Notes
 # ============================
 @input_error
 def add_note(notes: Notes) -> str:
+    """Adds a new note to the collection."""
     title = input(Colorize.highlight("Enter note title: "))
     text = input(Colorize.highlight("Enter note text: "))
     tags = input(Colorize.highlight("Enter note tags (comma separated): "))
@@ -345,6 +359,7 @@ def add_note(notes: Notes) -> str:
 
 @input_error
 def find_note_by_title(notes: Notes) -> str:
+    """Finds a note by its title."""
     title = input(Colorize.highlight("Enter note title to find: "))
     note = notes.find_note_by_title(title)
     if note:
@@ -355,6 +370,7 @@ def find_note_by_title(notes: Notes) -> str:
 
 @input_error
 def delete_note(notes: Notes) -> str:
+    """Deletes a note by its title."""
     title = input(Colorize.highlight("Enter note title to delete: "))
     result = notes.delete_note(title)
     return result
@@ -362,6 +378,7 @@ def delete_note(notes: Notes) -> str:
 
 @input_error
 def change_note(notes: Notes) -> str:
+    """Changes the content and/or tags of a note by its title."""
     title = input(Colorize.highlight("Enter note title to edit: "))
     new_content = input(Colorize.highlight("Enter new content: "))
     new_tags = input(Colorize.highlight("Enter new tags (comma separated): "))
@@ -373,6 +390,7 @@ def change_note(notes: Notes) -> str:
 
 @input_error
 def find_note_by_tag(notes: Notes) -> str:
+    """Finds notes by a specific tag."""
     tag = input(Colorize.highlight("Enter tag to find note: "))
     matched_notes = notes.find_note_by_tag(tag)
     divider = "-"*40
@@ -384,6 +402,7 @@ def find_note_by_tag(notes: Notes) -> str:
 
 @input_error
 def show_all_notes(notes: Notes) -> str:
+    """Shows all notes."""
     return notes.show_all_notes()
 
 
@@ -393,31 +412,31 @@ def show_all_notes(notes: Notes) -> str:
 @input_error
 def show_help(*args, **kwargs) -> str:
     """
-    Повертає список доступних команд.
+    Returns a help string listing all available commands.
     """
     return (
-        "Доступні команди:\n"
-        "  add <name> <phone>                – додати контакт або телефон до існуючого\n"
-        "  change <name> <old> <new>         – змінити номер телефону\n"
-        "  delete <name>                     – видалити контакт\n"
-        "  phone <name>                      – показати телефони контакту\n"
-        "  email <name>                      – показати email-и контакту\n"
-        "  birthday <name>                   – показати день народження контакту\n"
-        "  contact <name>                    – показати всі дані контакту\n"
-        "  all                               – показати всі контакти\n"
-        "  add-address <name> <address>      – додати/оновити адресу контакта\n"
-        "  add-email <name> <email>          – додати email контакту\n"
-        "  change-email <name> <old> <new>   – змінити email контакту\n"
-        "  delete-email <name> <email>       – видалити email контакту\n"
-        "  add-birthday <name> <DD.MM.YYYY>  – додати день народження\n"
-        "  birthdays [days]                  – дні народження впродовж N днів (7 за замовчуванням)\n"
-        "  search <field> <value>            – пошук за phone / email / birthday\n"
-        "  add-note                          – додати нотатку\n"
-        "  change-note                       – змінити нотатку\n"
-        "  delete-note                       – видалити нотатку\n"
-        "  find-note-by-title                – знайти нотатку за заголовком\n"
-        "  find-note-by-tag                  – знайти нотатку за тегом\n"
-        "  all-notes                         – показати всі нотатки\n"
-        "  help                              – показати цю довідку\n"
-        "  exit | close                      – вийти з помічника\n"
+        "Available commands:\n"
+        "  add <name> <phone>                – add a contact or phone number to an existing one\n"
+        "  change <name> <old> <new>         – change phone number\n"
+        "  delete <name>                     – delete a contact\n"
+        "  phone <name>                      – show contact's phone numbers\n"
+        "  email <name>                      – show contact's emails\n"
+        "  birthday <name>                   – show contact's birthday\n"
+        "  contact <name>                    – show all contact data\n"
+        "  all                               – show all contacts\n"
+        "  add-address <name> <address>      – add/update contact's address\n"
+        "  add-email <name> <email>          – add email to contact\n"
+        "  change-email <name> <old> <new>   – change contact's email\n"
+        "  delete-email <name> <email>       – delete contact's email\n"
+        "  add-birthday <name> <DD.MM.YYYY>  – add birthday\n"
+        "  birthdays [days]                  – birthdays within N days (7 by default)\n"
+        "  search <field> <value>            – search by phone / email / birthday\n"
+        "  add-note                          – add a note\n"
+        "  change-note                       – change a note\n"
+        "  delete-note                       – delete a note\n"
+        "  find-note-by-title                – find a note by title\n"
+        "  find-note-by-tag                  – find a note by tag\n"
+        "  all-notes                         – show all notes\n"
+        "  help                              – show this help\n"
+        "  exit | close                      – exit the assistant\n"
     )

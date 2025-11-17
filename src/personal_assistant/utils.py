@@ -4,6 +4,7 @@ from .colorize import Colorize
 
 
 def input_error(func):
+    """Decorator for handling input errors and providing usage messages."""
     usage_messages = {
         # General
         "HELLO": Colorize.warning(f"Usage: {Command_Use.HELLO.value}"),
@@ -38,6 +39,7 @@ def input_error(func):
     }
 
     def inner(*args, **kwargs):
+        """Inner function to wrap the original function with error handling."""
         try:
             return func(*args, **kwargs)
 
