@@ -1,20 +1,20 @@
 # 📘 **Personal Assistant CLI**
 
-**Personal Assistant CLI** — це консольний помічник, який дозволяє:
-- зберігати контакти (телефони, email, адреси, дні народження)
-- вести нотатки з тегами
-- шукати та переглядати записи
-- користуватися автодоповненням команд
-- зручно працювати з кольоровими підказками в терміналі
+**Personal Assistant CLI** — is a console assistant that allows you to:
+- store contacts (phones, emails, addresses, birthdays)
+- manage notes with tags
+- search and view records
+- use command auto-completion
+- conveniently work with colored terminal hints
 
-Додаток працює локально та зберігає ваші дані в  
-**`~/.assistant/addressbook.pkl`**, незалежно від того, на якій ви операційній системі.
+The application works locally and saves your data in  
+**`~/.assistant/addressbook.pkl`**, regardless of your operating system.
 
 ---
 
-## 🚀 Встановлення
+## 🚀 Installation
 
-### 1. Встановлення через PyPI (рекомендовано)
+### 1. Install via PyPI (recommended)
 
 ```
 
@@ -22,9 +22,9 @@ pip install personal-assistant
 
 ```
 
-### 2. Запуск програми
+### 2. Run the program
 
-Після встановлення з’являється команда:
+After installation, a new command becomes available:
 
 ```
 
@@ -32,135 +32,134 @@ assistant
 
 ```
 
-Це запустить інтерфейс Personal Assistant CLI.
+This launches the Personal Assistant CLI interface.
 
 ---
 
-## 📂 Де зберігаються дані?
+## 📂 Where are data stored?
 
-Контакти та нотатки зберігаються **не в пакеті**, а у вашому домашньому каталозі:
+Contacts and notes are stored not in the package, but in your home directory:
 
 - Linux / macOS: `/home/USER/.assistant/addressbook.pkl`
 - Windows: `C:\Users\USER\.assistant\addressbook.pkl`
 
-Файл створюється автоматично.
+The file is created automatically.
 
 ---
 
-## 📜 Основні можливості
+## 📜 Main Features
 
-### 👥 **Робота з контактами**
+### 👥 **Contact Management**
 ```
-       Дія        |         Команда
+       Action       |         Command
 --------------------------------------------------------
-Додати контакт    | `add John 380991234567`
-Змінити телефон   | `change John 380991234567 0671234567`
-Видалити контакт  | `delete John`
-Показати телефон  | `phone John`
-Показати email    | `email John`
-Показати день народження  | `birthday John`
-Показати повну інформацію | `contact John`
-Вивести всі контакти      | `all`
+Add contact         | `add John 380991234567`
+Change phone        | `change John 380991234567 0671234567`
+Delete contact      | `delete John`
+Show phone          | `phone John`
+Show email          | `email John`
+Show birthday       | `birthday John`
+Show full info      | `contact John`
+Show all contacts   | `all`
 ```
 
-## ✉ Email
+### ✉ **Email**
 ```
-     Дія       |            Команда
+     Action      |            Command
 --------------------------------------------------------
-Додати email   | `add-email John example@gmail.com`
-Змінити email  | `change-email John old@gmail.com new@gmail.com`
-Видалити email | `delete-email John example@gmail.com`
+Add email        | `add-email John example@gmail.com`
+Change email     | `change-email John old@gmail.com new@gmail.com`
+Delete email     | `delete-email John example@gmail.com`
 ```
 
-## 🎂 Дні народження
+### 🎂 **Birthdays**
 ```
-               Дія                |     Команда
+            Action           |     Command
 --------------------------------------------------------
-Додати день народження            | `add-birthday John 2000-01-31`
-Показати день народження          | `birthday John`
-Дні народження у найближчі 7 днів | `birthdays`
-У найближчі 35 днів               | `birthdays 35`
+Add birthday                 | `add-birthday John 2000-01-31`
+Show birthday                | `birthday John`
+Birthdays within next 7 days | `birthdays`
+Within the next 35 days      | `birthdays 35`
 ```
 
-## 🏠 Адреси
+### 🏠 **Addresses**
 ```
-      Дія     |     Команда
+   Action     |     Command
 --------------------------------------------------------
-Додати адресу | `add-address John Kyiv, Lesi Ukrainky 12`
+Add address   | `add-address John Kyiv, Lesi Ukrainky 12`
 ```
 
-## 📝 Нотатки
+### 📝 **Notes**
 ```
-          Дія         |     Команда
+      Action      |     Command
 --------------------------------------------------------
-Додати нотатку      | `add-note`
-Видалити нотатку    | `delete-note`
-Змінити нотатку     | `change-note`
-Знайти за назвою    | `find-note-by-title`
-Знайти за тегом     | `find-note-by-tag`
-Вивести всі нотатки | `all-notes`
+Add note          | `add-note`
+Delete note       | `delete-note`
+Edit note         | `change-note`
+Find by title     | `find-note-by-title`
+Find by tag       | `find-note-by-tag`
+Show all notes    | `all-notes`
 ```
 
-## 🤖 Загальні команди
+### 🤖 **General Commands**
 ```
-        Дія       |     Команда
+    Action    |     Command
 --------------------------------------------------------
-Привітання        | `hello`
-Завершення роботи | `exit` або `close`
-Довідка           | `help`
+Greeting      | `hello`
+Exit          | `exit` or `close`
+Help          | `help`
 ```
 
-## 🧩 Автодоповнення команд
+### 🧩 **Command Auto-completion**
 
-Додаток підтримує:
-
-- підказки під час набору
-- пошук найближчої команди (`Did you mean..?`)
-- кольоровий інтерфейс (через `colorama`)
+The application supports:
+- suggestions while typing (tab to complete)
+- nearest command search (`Did you mean..?`)
+- a colored interface (via `colorama`)
+- output of contacts as a table (using `prettytable`)
 
 ---
-## ❓ FAQ / Поширені питання
+## ❓ FAQ
 
-- Де зберігаються мої контакти?
+Where are my contacts stored?
 ```
 ~/.assistant/addressbook.pkl (Linux/macOS) 
-або 
+or
 C:\Users\USER\.assistant\addressbook.pkl (Windows).
 ```
-- Чому я бачу старі дані після видалення пакета?
+Why do I still see old data after uninstalling the package?
 ```
-Дані залишаються у файлі addressbook.pkl. Щоб почати з чистого листа — видали цей файл.
+Data remains in addressbook.pkl. To start fresh — delete this file.
 ```
-- Чи можна переносити дані на інший комп’ютер?
+Can I transfer my data to another computer?
 ```
-Так, скопіюй файл addressbook.pkl на нову машину в аналогічне розташування.
+Yes, copy addressbook.pkl to the same location on the new machine.
 ```
-- Як додати нову команду чи змінити поведінку бота?
+How do I add a new command or change the assistant’s behavior?
+```
+Edit the code in src/personal_assistant and 
+reinstall the package locally (pip install -e .).
+```
+## ⌨️ Quick Usage Examples
 
-```
-Для цього потрібно редагувати код у папці src/personal_assistant
-та перевстановити пакет локально (pip install -e .).
-```
-## ⌨️ Короткі приклади використання
-
-#### Додати контакт
+#### Add a contact
 `assistant> add John 380991234567`
 
-#### Додати email
+#### Add an email
 `assistant> add-email John john@gmail.com`
 
-#### Перевірити день народження
+#### Check birthday
 `assistant> birthday John`
 
-#### Подивитись всі контакти
+#### View all contacts
 `assistant> all`
 
-## 💠 Системні вимоги
+## 💠 System Requirements
 - Python ≥ 3.9
-- Пакети: colorama, prettytable, prompt_toolkit, wcwidth
-- Працює на Linux, macOS та Windows
+- Packets: colorama, prettytable, prompt_toolkit, wcwidth
+- Works on Linux, macOS and Windows
 
-## 📦 Структура проєкту (для розробників)
+## 📦 Project Structure (for developers)
 
 ```
 personal-assistant/
@@ -173,35 +172,35 @@ personal-assistant/
 │   ├── errors.py
 │   ├── fields.py
 │   ├── input_parser.py
+│   ├── main.py
 │   ├── notes.py
 │   ├── pickle_data.py
 │   ├── record.py
 │   ├── utils.py
 │   └── **init**.py
 │
-├── main.py
 ├── pyproject.toml
 ├── setup.cfg
 ├── requirements.txt
 └── README.md
 ```
 
-## 🛠 Розробка та локальне встановлення
+## 🛠 Development & Local Installation
 
-### Клонування
+### Clone the repository
 
 ```
 git clone [https://github.com/](https://github.com/)<your_repo>/personal_assistant
 cd personal_assistant
 ```
 
-### Локальна установка у режимі розробки
+### Local installation in development mode
 
 ```
 pip install -e .
 ```
 
-### Запуск локальної версії
+### Run the local version
 
 ```
 assistant
@@ -209,15 +208,15 @@ assistant
 
 ---
 
-## 📤 Публікація на PyPI
+## 📤 Publishing to PyPI
 
-### Створити дистрибутив
+### Build the distribution
 
 ```
 python -m build
 ```
 
-### Завантажити
+### Upload
 
 ```
 twine upload dist/*
@@ -225,19 +224,17 @@ twine upload dist/*
 
 ---
 
-## 📝 Ліцензія та внесок
-Проект ліцензований під **MIT License**.
-Внесок: через pull request або issue на GitHub
+## 📝 License & Contribution
+The project is licensed under **MIT License**.
+Contributions: via pull request or issue on GitHub.
 
 ---
 
-## ❤️ Автори
+## ❤️ Authors
 
-Команда **Pythonauts**  
-Ваш персональний CLI-асистент для роботи з контактами та нотатками.
+Team **PythoNauts**  
+Your personal CLI assistant for working with contacts and notes.
 
-## 📫 Контакт / Підтримка
+## 📫 Contact / Support
 - GitHub: https://github.com/yulikafsd/personal_assistant
 - Email: ju.zagorovsky@gmail.com
-
-```
