@@ -191,7 +191,7 @@ personal-assistant/
 ### Клонування
 
 ```
-git clone [https://github.com/](https://github.com/)<your_repo>/personal_assistant
+git clone https://github.com/yulikafsd/personal_assistant
 cd personal_assistant
 ```
 
