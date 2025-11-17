@@ -9,27 +9,29 @@ class Command_Use(Enum):
     EXIT = "exit"
 
     # ---------------- Phone ----------------
-    ADD = "add [name] [phone]"
-    CHANGE = "change [name] [old_phone] [new_phone]"
-    DELETE = "delete [name]"
+    ADD = "add <name> <phone>"
+    CHANGE = "change <name> <old-phone> <new-phone>"
+
+    # ---------------- Contact ----------------
+    DELETE = "delete <name>"
 
     # ---------------- Emails ----------------
-    ADD_EMAIL = "add-email [name] [email]"
-    CHANGE_EMAIL = "change-email [name] [old_email] [new_email]"
-    DELETE_EMAIL = "delete-email [name] [email]"
+    ADD_EMAIL = "add-email <name> <email>"
+    CHANGE_EMAIL = "change-email <name> <old-email> <new-email>"
+    DELETE_EMAIL = "delete-email <name> <email>"
 
     # ---------------- Birthdays ----------------
-    ADD_BIRTHDAY = "add-birthday [name] [birthday]"
-    BIRTHDAYS = "birthdays( [days_from_today])"
+    ADD_BIRTHDAY = "add-birthday <name> <birthday>"
+    BIRTHDAYS = "birthdays[ <days-from-today>]"
 
     # ---------------- Address ----------------
-    ADD_ADDRESS = "add-address [name] [address]"
+    ADD_ADDRESS = "add-address <name> <address>"
 
     # ---------------- Show Contact's Info ----------------
-    PHONE = "phone [name]"
-    BIRTHDAY = "birthday [name]"
-    EMAIL = "email [name]"
-    CONTACT = "contact [name]"
+    PHONE = "phone <name>"
+    BIRTHDAY = "birthday <name>"
+    EMAIL = "email <name>"
+    CONTACT = "contact <name>"
     ALL = "all"
 
     # ---------------- Notes ----------------
@@ -41,7 +43,7 @@ class Command_Use(Enum):
     ALL_NOTES = "all-notes"
 
 
-# Список відомих команд для автодоповнення та "did you mean"
+# Commands list for autosuggest and "Did you mean..?"
 command_list = [
     "hello",
     "exit",

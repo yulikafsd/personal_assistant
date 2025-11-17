@@ -1,12 +1,12 @@
-import sys
+# import sys
+# sys.path.append("src")
+# # перед здачею проєкту видалити 1–3 рядки та встановити пакет локально:
+# # pip install -e src/import difflib
+
 import difflib
 from prompt_toolkit import PromptSession
 from prompt_toolkit.auto_suggest import AutoSuggest, Suggestion
 
-sys.path.append("src")
-
-# перед здачею проєкту видалити 1–3 рядки та встановити пакет локально:
-# pip install -e src/
 
 from personal_assistant import (
     Command_Use,
@@ -56,7 +56,7 @@ class AutoSuggestFromList(AutoSuggest):
         # Пошук першої команди, що починається з введеного тексту
         for option in self.options:
             if option.startswith(text.lower()):
-                return Suggestion(option[len(text):])
+                return Suggestion(option[len(text) :])
 
         return None
 
@@ -181,9 +181,17 @@ def main():
                     )
 
                     if matches:
-                        print(Colorize.warning(f"Invalid command. Did you mean '{matches[0]}'?"))
+                        print(
+                            Colorize.warning(
+                                f"Invalid command. Did you mean '{matches[0]}'?"
+                            )
+                        )
                     else:
-                        print(Colorize.error("Invalid command. Type 'help' to see all commands."))
+                        print(
+                            Colorize.error(
+                                "Invalid command. Type 'help' to see all commands."
+                            )
+                        )
 
         except KeyboardInterrupt:
             # Коректний вихід через Ctrl+C
