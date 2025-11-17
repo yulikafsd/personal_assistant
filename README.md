@@ -1,14 +1,15 @@
-# 📘 **Personal Assistant CLI**
+# 📘 **PythoNauts Assistant CLI**
 
-**Personal Assistant CLI** — is a console assistant that allows you to:
+**PythoNauts Assistant CLI** — is a console assistant that allows you to:
 - store contacts (phones, emails, addresses, birthdays)
 - manage notes with tags
 - search and view records
 - use command auto-completion
 - conveniently work with colored terminal hints
+- show contact list in a table view
 
 The application works locally and saves your data in  
-**`~/.assistant/addressbook.pkl`**, regardless of your operating system.
+**`~/.pn-assistant/addressbook.pkl`**, regardless of your operating system.
 
 ---
 
@@ -18,7 +19,7 @@ The application works locally and saves your data in
 
 ```
 
-pip install personal-assistant
+pip install pn-assistant
 
 ```
 
@@ -28,11 +29,11 @@ After installation, a new command becomes available:
 
 ```
 
-assistant
+pn-assistant
 
 ```
 
-This launches the Personal Assistant CLI interface.
+This launches the PythoNauts Assistant CLI interface.
 
 ---
 
@@ -40,8 +41,8 @@ This launches the Personal Assistant CLI interface.
 
 Contacts and notes are stored not in the package, but in your home directory:
 
-- Linux / macOS: `/home/USER/.assistant/addressbook.pkl`
-- Windows: `C:\Users\USER\.assistant\addressbook.pkl`
+- Linux / macOS: `/home/USER/.pn-assistant/addressbook.pkl`
+- Windows: `C:\Users\USER\.pn-assistant\addressbook.pkl`
 
 The file is created automatically.
 
@@ -123,9 +124,9 @@ The application supports:
 
 Where are my contacts stored?
 ```
-~/.assistant/addressbook.pkl (Linux/macOS) 
+~/.pn-assistant/addressbook.pkl (Linux/macOS) 
 or
-C:\Users\USER\.assistant\addressbook.pkl (Windows).
+C:\Users\USER\.pn-assistant\addressbook.pkl (Windows).
 ```
 Why do I still see old data after uninstalling the package?
 ```
