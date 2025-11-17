@@ -14,6 +14,7 @@ class Record:
     """
 
     def __init__(self, name):
+        """Initializes Record with a Name and empty lists for phones and emails."""
         self.name = Name(name)
         self.phones: list[Phone] = []
         self.birthday: Birthday | None = None
@@ -28,15 +29,15 @@ class Record:
         """
         Add new phone number to contact.
 
-        - Нормалізує номер через клас Phone (видаляє +, пробіли, дужки, тощо).
-        - Перевіряє, чи такий нормалізований номер вже є в записі.
+        - Normalizes the number via the Phone class (removes +, spaces, brackets, etc.).
+        - Checks if such a normalized number already exists in the record.
         """
         try:
-            phone_obj = Phone(number)  # тут відбувається валідація + нормалізація
+            phone_obj = Phone(number)  # validation + normalization
         except ValidationError as e:
             return Colorize.error(f"ERROR! No phone number was added! {e}")
 
-        # Порівнюємо за нормалізованим значенням (phone_obj.value)
+        # Compare by normalized value (phone_obj.value)
         if any(p.value == phone_obj.value for p in self.phones):
             return Colorize.error(
                 f"{self.name.value}'s record already has the number: "
@@ -53,17 +54,17 @@ class Record:
         """
         Update existing phone number.
 
-        - old_phone: шукаємо по нормалізованому значенню (користувач може ввести в іншому форматі).
-        - new_phone: нормалізуємо та валідовуємо перед оновленням.
+        - old_phone: search by normalized value (user can enter in a different format).
+        - new_phone: normalize and validate before updating.
         """
-        # Нормалізуємо старий номер, щоб знайти його в списку
+        # Normalize the old number to find it in the list
         try:
             normalized_old = Phone(old_phone).value
         except ValidationError:
-            # Якщо старий номер навіть не валідний — спробуємо шукати як є
+            # If the old number is not even valid — try to search as is
             normalized_old = old_phone
 
-        # Знаходимо потрібний Phone-об'єкт
+        # Find the target Phone object
         target_phone = None
         for phone in self.phones:
             if phone.value == normalized_old or phone.value == old_phone:
@@ -73,7 +74,7 @@ class Record:
         if not target_phone:
             return Colorize.error(f"User {self.name.value} has no phone {old_phone}.")
 
-        # Оновлюємо новим номером (всередині знову валідатор + нормалізація)
+        # Update with the new number (validation + normalization)
         try:
             target_phone.update(new_phone)
             return Colorize.success(
@@ -161,19 +162,19 @@ class Record:
         """
         Compares phones using normalized value.
 
-        Користувач може шукати номер у будь-якому форматі:
+        User can search for number in any format:
         - 0991234567
         - 099-123-45-67
         - +380991234567
         - 380991234567
 
-        Ми нормалізуємо введене значення і порівнюємо з уже збереженими
-        нормалізованими номерами.
+        We normalize the entered value and compare it with the already saved
+        normalized numbers.
         """
         try:
             normalized = Phone(phone).value
         except ValidationError:
-            # Якщо пошуковий номер невалідний — вважаємо, що збігів немає
+            # If the search number is invalid — consider no matches
             return False
 
         return any(p.value == normalized for p in self.phones)
@@ -203,6 +204,7 @@ class Record:
     # ============================
 
     def __str__(self):
+        """String representation of the contact record."""
         phones_str = f", phone(s): {'; '.join(p.value for p in self.phones)}" if self.phones else ""
         emails_str = f", email(s): {'; '.join(e.value for e in self.emails)}" if self.emails else ""
         bday_str = f", birthday: {self.birthday}" if self.birthday else ""

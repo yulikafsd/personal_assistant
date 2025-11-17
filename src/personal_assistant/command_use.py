@@ -2,6 +2,7 @@ from enum import Enum
 
 
 class Command_Use(Enum):
+    """Enum class to hold all command usage strings in one place."""
 
     # ---------------- General ----------------
     HELLO = "hello"

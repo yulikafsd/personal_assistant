@@ -41,19 +41,21 @@ from personal_assistant.colorize import Colorize
 
 
 class AutoSuggestFromList(AutoSuggest):
-    """Автодоповнення команд з фіксованого списку."""
+    """Auto-suggestion class that suggests commands from a predefined list."""
 
     def __init__(self, options):
+        """Initializes the auto-suggest with a list of options."""
         self.options = sorted(options)
 
     def get_suggestion(self, buffer, document):
+        """Returns a suggestion based on the current input."""
         text = document.text_before_cursor.strip()
 
-        # Порожній ввід — без підказок
+        # If no text is entered, return None
         if not text:
             return None
 
-        # Пошук першої команди, що починається з введеного тексту
+        # Search for the first command that starts with the entered text
         for option in self.options:
             if option.startswith(text.lower()):
                 return Suggestion(option[len(text) :])
@@ -63,10 +65,11 @@ class AutoSuggestFromList(AutoSuggest):
 
 def print_main_menu() -> None:
     """
-    Виводить головне меню з доступними командами.
-    Використовує Enum Command_Use, щоб всі команди зберігались в одному місці.
-    Показується лише один раз — при старті програми.
+    Displays the main menu with available commands.
+    Uses the Enum Command_Use to keep all commands in one place.
+    Only shown once — at program startup.
     """
+
     print("\n=== MAIN MENU ===")
     print("Available commands:")
     for cmd in Command_Use:
@@ -75,21 +78,23 @@ def print_main_menu() -> None:
 
 
 def main():
-    # завантаження даних контактів та нотаток
+    """Main function to run the personal assistant bot."""
+    
+    # loading contact and note data
     book, notes = load_data()
 
     print(Colorize.highlight("Welcome to the assistant bot!"))
-    # показуємо головне меню тільки при запуску
+    # showing the main menu only at startup
     print_main_menu()
 
-    # сесія вводу з автодоповненням команд
+    # input session with command auto-suggestion
     session = PromptSession(auto_suggest=AutoSuggestFromList(command_list))
 
     while True:
         try:
-            # читаю команду від користувача
+            # reading command from the user
             user_input = session.prompt("Enter a command: ")
-            # розбираю команду та аргументи
+            # parsing command and arguments
             command, args = parse_input(user_input)
 
             if not command:
@@ -106,7 +111,7 @@ def main():
                     print(Colorize.highlight("How can I help you?"))
 
                 case "help":
-                    # виведення довідки по доступним командам
+                    # displaying help for available commands
                     print(show_help())
 
                 case "add":
@@ -143,7 +148,6 @@ def main():
                     print(change_email(args, book))
 
                 case "delete-email":
-                    # тут раніше не було print — тепер результат бачимо в консолі
                     print(delete_email(args, book))
 
                 case "add-birthday":
@@ -153,7 +157,7 @@ def main():
                     print(birthdays(args, book))
 
                 case "search":
-                    # пошук по телефону / email / даті народження
+                    # search by phone, email, birthday
                     print(search_contacts(args, book))
 
                 case "add-note":
@@ -175,7 +179,7 @@ def main():
                     print(show_all_notes(notes))
 
                 case _:
-                    # Шукаємо найбільш схожу команду
+                    # Searching for the most similar command
                     matches = difflib.get_close_matches(
                         command, command_list, n=1, cutoff=0.6
                     )
@@ -194,12 +198,12 @@ def main():
                         )
 
         except KeyboardInterrupt:
-            # Коректний вихід через Ctrl+C
+            # Correctly handle Ctrl+C
             print(Colorize.highlight("Good bye!"))
             save_data(book, notes)
             break
         except ValueError:
-            # parse_input повернув щось некоректне — просто пропускаємо і чекаємо наступний ввід
+            # parse_input returned something incorrect — just skip and wait for the next input
             continue
 
 

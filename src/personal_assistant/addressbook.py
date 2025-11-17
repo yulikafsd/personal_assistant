@@ -7,15 +7,20 @@ from .colorize import Colorize
 
 
 class AddressBook(UserDict):
+    """Address book that stores multiple entries."""
+
     def add_record(self, record: Record):
+        """Adds a new record to the address book."""
         self.data[record.name.value] = record
         return Colorize.success(f"New record for {record.name.value} was added to the book:\n{self.data}")
 
     def find(self, name: str) -> Record | None:
+        """Finds a record by name."""
         record = self.data.get(name)
         return record if record else None
 
     def delete(self, name: str) -> str:
+        """Deletes a record by name."""
         record = self.data.get(name)
         if not record:
             return Colorize.error(f"No contact {name} was found")
@@ -24,8 +29,8 @@ class AddressBook(UserDict):
 
     def get_upcoming_birthdays(self, days_from_today: int) -> list[dict]:
         """
-        Повертає список контактів, у яких день народження
-        в проміжку [сьогодні; сьогодні + days_from_today].
+        Returns a list of contacts whose birthdays
+        are in the range [today; today + days_from_today].
         """
         today = datetime.today().date()
         current_year = today.year
@@ -33,20 +38,20 @@ class AddressBook(UserDict):
         upcoming_birthdays: list[dict] = []
 
         for record in self.data.values():
-            # якщо в записі немає дня народження — пропускаємо
+            # if there is no birthday in the entry - skip it
             if not record.birthday:
                 continue
 
             bd = record.birthday.value.date()
 
-            # 29 лютого — окремий випадок
+            # February 29th — special case
             try:
                 next_bd = bd.replace(year=current_year)
             except ValueError:
-                # Для дати 29.02 використовуємо 28.02
+                # For the date 29.02 use 28.02
                 next_bd = date(current_year, 2, 28)
 
-            # Якщо день народження вже був цього року — переносимо на наступний
+            # If the birthday has already occurred this year, move to the next year
             if next_bd < today:
                 try:
                     next_bd = bd.replace(year=current_year + 1)
@@ -66,25 +71,25 @@ class AddressBook(UserDict):
         return upcoming_birthdays
 
     # ===============================
-    # 🔍 Пошук для твого завдання
+    # 🔍 Search helpers
     # ===============================
 
     def search_by_phone(self, phone: str) -> list[Record]:
-        """Пошук контактів за точним номером телефону."""
+        """Search contacts by exact phone number."""
         return [rec for rec in self.data.values() if rec.matches_phone(phone)]
 
     def search_by_email(self, email: str) -> list[Record]:
-        """Пошук контактів за точним email."""
+        """Search contacts by exact email."""
         return [rec for rec in self.data.values() if rec.matches_email(email)]
 
     def search_by_birthday(self, date_str: str) -> list[Record]:
-        """Пошук контактів за точною датою народження (DD.MM.YYYY)."""
+        """Search contacts by exact birthday date (DD.MM.YYYY)."""
         result: list[Record] = []
         for rec in self.data.values():
             try:
                 if rec.matches_birthday(date_str):
                     result.append(rec)
             except ValidationError:
-                # якщо користувач ввів неправильну дату в пошуку — просто пропускаємо
+                # if the user entered an incorrect date in the search — just skip it
                 continue
         return result
